@@ -1,14 +1,12 @@
-﻿using MedicalEdu.Domain.Enums;
+﻿using MedicalEdu.Domain.Abstractions;
+using MedicalEdu.Domain.Enums;
+using MedicalEdu.Domain.ValueObjects;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class User
+public sealed class User : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the user.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the user.
@@ -34,11 +32,6 @@ public sealed class User
     /// Gets or sets the role of the user.
     /// </summary>
     public UserRole Role { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date and time when the user was created.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the user was last updated.

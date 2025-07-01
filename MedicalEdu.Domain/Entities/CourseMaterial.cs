@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MedicalEdu.Domain.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class CourseMaterial
+public sealed class CourseMaterial : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the course material.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the course identifier this material belongs to.
@@ -62,11 +59,6 @@ public sealed class CourseMaterial
     /// Gets or sets whether this material is free or requires payment/enrollment.
     /// </summary>
     public bool IsFree { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date and time when the material was uploaded.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the material was last updated.

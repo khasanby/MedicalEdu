@@ -1,13 +1,10 @@
+using MedicalEdu.Domain.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class AvailabilitySlot
+public sealed class AvailabilitySlot : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the availability slot.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the course identifier this slot is for.
@@ -46,11 +43,6 @@ public sealed class AvailabilitySlot
     /// </summary>
     [MaxLength(500)]
     public string? Notes { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date and time when the slot was created.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the slot was last updated.

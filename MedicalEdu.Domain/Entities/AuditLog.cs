@@ -1,14 +1,11 @@
+using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class AuditLog
+public sealed class AuditLog : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the audit log entry.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the entity that was modified.
@@ -61,10 +58,7 @@ public sealed class AuditLog
     /// </summary>
     public string? Metadata { get; set; }
 
-    /// <summary>
-    /// Gets or sets the date and time when the action was performed.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
+
 
     // Navigation property
     public virtual User? User { get; set; }

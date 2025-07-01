@@ -1,13 +1,10 @@
+using MedicalEdu.Domain.Abstractions;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class Enrollment
+public sealed class Enrollment : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the enrollment.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the student identifier.

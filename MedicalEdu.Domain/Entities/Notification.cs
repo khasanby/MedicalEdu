@@ -1,14 +1,11 @@
+using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class Notification
+public sealed class Notification : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the notification.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the user identifier this notification is for.
@@ -66,10 +63,7 @@ public sealed class Notification
     /// </summary>
     public string? Metadata { get; set; }
 
-    /// <summary>
-    /// Gets or sets the date and time when the notification was created.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
+
 
     /// <summary>
     /// Gets or sets the date and time when the notification was read.

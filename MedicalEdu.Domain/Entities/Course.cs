@@ -1,13 +1,10 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using MedicalEdu.Domain.Abstractions;
+using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class Course
+public sealed class Course : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the course.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the unique identifier for the instructor of the course.
@@ -42,11 +39,6 @@ public sealed class Course
     /// Gets or sets the course thumbnail image URL.
     /// </summary>
     public string? ThumbnailUrl { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date and time when the course was created.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the course was last updated.

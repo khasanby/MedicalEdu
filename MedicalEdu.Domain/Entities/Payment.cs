@@ -1,14 +1,11 @@
+using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class Payment
+public sealed class Payment : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the payment.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the booking identifier this payment is for.
@@ -68,10 +65,7 @@ public sealed class Payment
     [MaxLength(500)]
     public string? FailureReason { get; set; }
 
-    /// <summary>
-    /// Gets or sets the date and time when the payment was created.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
+
 
     /// <summary>
     /// Gets or sets the date and time when the payment was processed.

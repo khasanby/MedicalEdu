@@ -1,14 +1,11 @@
+using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace MedicalEdu.Domain.Entities;
 
-public sealed class Booking
+public sealed class Booking : IEntity<Guid>
 {
-    /// <summary>
-    /// Gets or sets the unique identifier for the booking.
-    /// </summary>
-    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the course identifier for this booking.
@@ -55,11 +52,6 @@ public sealed class Booking
     /// </summary>
     [MaxLength(1000)]
     public string? InstructorNotes { get; set; }
-
-    /// <summary>
-    /// Gets or sets the date and time when the booking was created.
-    /// </summary>
-    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the booking was last updated.
