@@ -7,11 +7,26 @@ Welcome to the MedicalEdu platform documentation. This folder contains comprehen
 ```
 Documentation/
 ├── README.md                    # This file - Documentation index
+├── API/                         # API documentation
+│   └── README.md
+├── Architecture/                # System architecture documentation
+│   └── README.md
+├── BusinessLogic/               # Business logic and workflows
+│   └── README.md
+├── Changelog/                   # Release notes and changes
+│   └── README.md
 ├── Database/                    # Database-related documentation
 │   ├── DATABASE_SCHEMA.md      # Complete database schema documentation
 │   ├── database_schema.dbml    # dbdiagram.io schema file
 │   └── README.md               # Database documentation index
-└── [Future folders]            # API, Frontend, Deployment, etc.
+├── Features/                    # Feature specifications and user stories
+│   └── README.md
+├── Frontend/                    # Frontend documentation
+│   └── README.md
+└── Technologies/                # Technologies, packages, and tools
+    ├── README.md               # Technologies overview
+    ├── EntityFramework.md      # EF Core documentation
+    └── AutoMapper.md           # AutoMapper documentation
 ```
 
 ## 🗄️ Database Documentation
@@ -29,6 +44,14 @@ The `Database/` folder contains all database-related documentation:
   - Copy-paste into https://dbdiagram.io/d
   - Interactive visual representation
   - Export to various formats (PNG, PDF, SQL)
+
+## 🛠️ Technologies Documentation
+
+The `Technologies/` folder contains comprehensive documentation for all technologies and packages used:
+
+- **[README.md](Technologies/README.md)** - Overview of all technologies and quick setup guide
+- **[EntityFramework.md](Technologies/EntityFramework.md)** - Complete EF Core setup, configuration, and usage
+- **[AutoMapper.md](Technologies/AutoMapper.md)** - AutoMapper configuration and mapping examples
 
 ## 🚀 Quick Start
 
