@@ -5,6 +5,10 @@ namespace MedicalEdu.Domain.Entities;
 
 public sealed class Enrollment : IEntity<Guid>
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the enrollment.
+    /// </summary>
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the student identifier.
@@ -39,11 +43,22 @@ public sealed class Enrollment : IEntity<Guid>
     public DateTime? CompletedAt { get; set; }
 
     /// <summary>
+    /// Gets or sets the date and time when the student last accessed the course.
+    /// </summary>
+    public DateTime? LastAccessedAt { get; set; }
+
+    /// <summary>
     /// Gets or sets the date and time when the enrollment was last updated.
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 
+    // Audit fields from IEntity
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
+
     // Navigation properties
     public virtual User Student { get; set; }
     public virtual Course Course { get; set; }
+    public virtual ICollection<CourseProgress> CourseProgresses { get; set; } = new List<CourseProgress>();
 } 

@@ -1,22 +1,24 @@
-# MedicalEdu Database Schema
+# MedicalEdu Database Schema - Optimized Version
 
 ## Overview
 
-This document describes the complete database schema for the MedicalEdu platform, designed to support medical education with course management, instructor-student bookings, payments, and comprehensive audit logging.
+This document describes the complete optimized database schema for the MedicalEdu platform, designed to support medical education with advanced course management, instructor-student bookings, payments, progress tracking, ratings, and comprehensive audit logging.
 
 ## Database Design Principles
 
 - **GUID Primary Keys**: All entities use GUIDs for better distribution and security
-- **Soft Deletes**: Where applicable, entities use status flags rather than hard deletes
-- **Audit Trail**: Comprehensive logging of all critical operations
+- **Soft Deletes**: Entities use `deleted_at` timestamps for data preservation
+- **Audit Trail**: Comprehensive logging of all critical operations with before/after JSON
 - **UTC Timestamps**: All dates stored in UTC for consistency across time zones
 - **Navigation Properties**: Full Entity Framework relationships defined
+- **Multi-Currency Support**: Flexible pricing with currency tracking
+- **Security First**: Account locking, session management, and comprehensive audit
 
 ## Core Entities
 
 ### Users Table
 
-Stores all platform users (Students, Instructors, Admins).
+Stores all platform users (Students, Instructors, Admins) with enhanced security features.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
@@ -24,108 +26,144 @@ Stores all platform users (Students, Instructors, Admins).
 - `EmailConfirmed`: Email verification status
 - `Role`: UserRole enum (Admin=0, Instructor=1, Student=2)
 - `TimeZone`: User's preferred timezone for booking display
+- `DeletedAt`: Soft delete timestamp
+- `PasswordResetToken`: For password reset functionality
+- `LastLoginAt`: Last login tracking
+- `FailedLoginAttempts`: Account security
+- `LockedUntil`: Account locking mechanism
 
 **Indexes:**
 - Unique index on `Email`
 - Index on `Role` for role-based queries
 - Index on `EmailConfirmed` for verification workflows
+- Index on `DeletedAt` for soft delete filtering
+- Index on `IsActive` for active user queries
+- Index on `LastLoginAt` for activity tracking
 
 ### Courses Table
 
-Stores course information created by instructors.
+Stores course information with rich metadata and categorization.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
 - `InstructorId` (FK): Links to Users table
 - `IsPublished`: Controls course visibility to students
-- `Price`: Optional course price for paid content
+- `Price`: Course price with currency support
+- `Currency`: ISO currency code (default: USD)
+- `ShortDescription`: Brief course description
+- `VideoIntroUrl`: Course introduction video
+- `DurationMinutes`: Course duration
+- `MaxStudents`: Maximum enrollment limit
+- `Category`: Course categorization
+- `Tags`: JSON array of course tags
+- `PublishedAt`: Publication timestamp
+- `DeletedAt`: Soft delete timestamp
 
 **Indexes:**
 - Index on `InstructorId` for instructor course listings
 - Index on `IsPublished` for public course queries
 - Composite index on `(IsPublished, CreatedAt)` for sorted listings
+- Index on `DeletedAt` for soft delete filtering
+- Index on `Category` for category-based queries
 
 ### CourseMaterials Table
 
-Stores uploaded course content (PDFs, videos, etc.).
+Stores uploaded course content with enhanced metadata and progress tracking.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
 - `CourseId` (FK): Links to Courses table
 - `FileUrl`: Blob storage URL
 - `IsFree`: Determines if payment/enrollment is required
-- `Order`: Display sequence within course
+- `SortIndex`: Display sequence within course
+- `DurationMinutes`: Video content duration
+- `IsRequired`: Whether material is required for completion
 
 **Indexes:**
 - Index on `CourseId` for course material queries
-- Composite index on `(CourseId, Order)` for ordered retrieval
+- Composite index on `(CourseId, SortIndex)` for ordered retrieval
+- Index on `IsFree` for free content filtering
 
 ### AvailabilitySlots Table
 
-Stores instructor availability for bookings.
+Stores instructor availability with advanced scheduling features.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
 - `CourseId` (FK): Associated course
-- `InstructorId` (FK): Slot owner
 - `StartTimeUtc`/`EndTimeUtc`: Slot time window
 - `IsBooked`: Booking status
 - `Price`: Slot-specific pricing
+- `Currency`: ISO currency code
+- `MaxParticipants`: Group session capacity
+- `CurrentParticipants`: Current participant count
+- `IsRecurring`: Recurring slot flag
+- `RecurringPattern`: JSON pattern for recurring slots
 
 **Indexes:**
-- Index on `InstructorId` for instructor availability
 - Index on `CourseId` for course-specific slots
 - Composite index on `(IsBooked, StartTimeUtc)` for available slot queries
 - Index on `StartTimeUtc` for time-based queries
+- Composite index on `(CourseId, StartTimeUtc, EndTimeUtc)` [unique]
 
 ### Bookings Table
 
-Stores student booking requests and their status.
+Stores student booking requests with complete lifecycle management.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
 - `StudentId` (FK): Booking student
-- `InstructorId` (FK): Booked instructor
 - `AvailabilitySlotId` (FK): Reserved slot
-- `Status`: BookingStatus enum (Pending, Confirmed, Cancelled, etc.)
+- `Status`: BookingStatus enum (Pending, Confirmed, Cancelled, Completed, NoShow, Rescheduled)
 - `Amount`: Booking price
+- `Currency`: ISO currency code
+- `RescheduledFromBookingId`: For rescheduled bookings
+- `MeetingUrl`: Virtual session URL
+- `MeetingNotes`: Post-session documentation
 
 **Business Rules:**
 - Only one booking per availability slot
-- Status transitions: Pending → Confirmed/Cancelled
+- Status transitions: Pending → Confirmed/Cancelled/Rescheduled
 - Confirmed bookings require successful payment
+- Rescheduled bookings maintain history
 
 **Indexes:**
 - Index on `StudentId` for student booking history
-- Index on `InstructorId` for instructor booking management
-- Index on `Status` for status-based queries
 - Index on `AvailabilitySlotId` for slot-booking relationship
+- Index on `Status` for status-based queries
+- Index on `CreatedAt` for booking timeline
+- Index on `RescheduledFromBookingId` for reschedule tracking
 
 ### Payments Table
 
-Stores payment transaction records.
+Stores payment transaction records with enhanced lifecycle support.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
 - `BookingId` (FK): Associated booking
-- `Status`: PaymentStatus enum (Pending, Succeeded, Failed, etc.)
+- `UserId` (FK): Payment user
+- `Status`: PaymentStatus enum (Pending, Succeeded, Failed, Cancelled, Refunded, PartiallyRefunded)
 - `Provider`: PaymentProvider enum (Stripe, PayPal)
 - `ProviderTransactionId`: External payment reference
 - `Currency`: ISO currency code
+- `RefundAmount`: Partial refund amount
+- `RefundReason`: Refund justification
 
 **Business Rules:**
 - One primary payment per booking (refunds create new records)
 - Webhook processing updates payment status
 - Failed payments don't confirm bookings
+- Partial refunds supported
 
 **Indexes:**
 - Index on `BookingId` for booking-payment lookup
 - Index on `ProviderTransactionId` for webhook processing
 - Index on `Status` for payment status queries
+- Index on `UserId` for user payment history
 
 ### Enrollments Table
 
-Tracks student enrollment in courses (for course access control).
+Tracks student enrollment with detailed progress monitoring.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
@@ -133,6 +171,7 @@ Tracks student enrollment in courses (for course access control).
 - `CourseId` (FK): Enrolled course
 - `ProgressPercentage`: Course completion (0-100)
 - `IsActive`: Enrollment status
+- `LastAccessedAt`: Last course access timestamp
 
 **Business Rules:**
 - One enrollment record per student per course
@@ -143,29 +182,54 @@ Tracks student enrollment in courses (for course access control).
 - Unique composite index on `(StudentId, CourseId)`
 - Index on `StudentId` for student enrollment queries
 - Index on `CourseId` for course enrollment metrics
+- Index on `IsActive` for active enrollment filtering
+
+### CourseProgress Table
+
+Granular progress tracking per course material.
+
+**Key Fields:**
+- `Id` (PK): Unique identifier
+- `EnrollmentId` (FK): Associated enrollment
+- `CourseMaterialId` (FK): Material being tracked
+- `IsCompleted`: Completion status
+- `CompletedAt`: Completion timestamp
+- `TimeSpentSeconds`: Time tracking
+
+**Business Rules:**
+- One progress record per material per enrollment
+- Tracks both completion and time spent
+- Supports detailed analytics
+
+**Indexes:**
+- Index on `EnrollmentId` for enrollment progress
+- Index on `CourseMaterialId` for material analytics
+- Index on `IsCompleted` for completion queries
 
 ### Notifications Table
 
-Stores system notifications and email records.
+Multi-channel notification system with scheduling support.
 
 **Key Fields:**
 - `Id` (PK): Unique identifier
 - `UserId` (FK): Notification recipient
 - `Type`: NotificationType enum
 - `IsRead`: Read status
-- `EmailSent`: Email delivery status
+- `EmailSent`/`SmsSent`/`PushSent`: Multi-channel delivery
+- `ScheduledFor`: Scheduled notification timestamp
 
 **Business Rules:**
-- Notifications can be in-app only or trigger emails
+- Notifications can be in-app, email, SMS, or push
+- Scheduled notifications for reminders
 - Related entity tracking for contextual notifications
-- Read status for user notification management
 
 **Indexes:**
 - Index on `UserId` for user notification queries
 - Index on `Type` for notification type filtering
 - Index on `IsRead` for unread notification counts
+- Index on `ScheduledFor` for scheduled notifications
 
-### AuditLog Table
+### AuditLogs Table
 
 Comprehensive audit trail for all critical operations.
 
@@ -176,6 +240,7 @@ Comprehensive audit trail for all critical operations.
 - `Action`: AuditActionType enum
 - `UserId` (FK): User who performed action
 - `OldValues`/`NewValues`: JSON change tracking
+- `IpAddress`/`UserAgent`: Security context
 
 **Business Rules:**
 - Immutable records (no updates/deletes)
@@ -187,6 +252,118 @@ Comprehensive audit trail for all critical operations.
 - Index on `EntityId` for entity change history
 - Index on `UserId` for user activity tracking
 - Index on `CreatedAt` for time-based audit queries
+- Index on `Action` for action-based filtering
+
+### PromoCodes Table
+
+Flexible discount system with usage limits and targeting.
+
+**Key Fields:**
+- `Id` (PK): Unique identifier
+- `Code`: Promo code string
+- `DiscountType`: DiscountType enum (Percentage, FixedAmount)
+- `DiscountValue`: Discount amount
+- `Currency`: ISO currency code
+- `MaxUses`/`CurrentUses`: Usage tracking
+- `ValidFrom`/`ValidUntil`: Validity period
+- `ApplicableCourseIds`: JSON array of course restrictions
+
+**Business Rules:**
+- Unique promo codes across platform
+- Usage limits and validity periods
+- Course-specific or platform-wide discounts
+- Percentage or fixed amount discounts
+
+**Indexes:**
+- Unique index on `Code`
+- Index on `IsActive` for active promo codes
+- Index on `ValidUntil` for expiration queries
+
+### BookingPromoCodes Table
+
+Tracks promo code applications to bookings.
+
+**Key Fields:**
+- `Id` (PK): Unique identifier
+- `BookingId` (FK): Associated booking
+- `PromoCodeId` (FK): Applied promo code
+- `DiscountAmount`: Applied discount amount
+
+**Business Rules:**
+- One promo code application per booking
+- Tracks actual discount applied
+
+**Indexes:**
+- Index on `BookingId` for booking discount lookup
+- Index on `PromoCodeId` for promo code usage
+
+### UserSessions Table
+
+Session management and security tracking.
+
+**Key Fields:**
+- `Id` (PK): Unique identifier
+- `UserId` (FK): Session owner
+- `SessionToken`: Unique session identifier
+- `IpAddress`/`UserAgent`: Security context
+- `ExpiresAt`: Session expiration
+- `LastActivityAt`: Activity tracking
+
+**Business Rules:**
+- Unique session tokens
+- Automatic expiration
+- Activity tracking for security
+
+**Indexes:**
+- Index on `UserId` for user session queries
+- Unique index on `SessionToken`
+- Index on `ExpiresAt` for cleanup queries
+
+### InstructorRatings Table
+
+Instructor feedback system with reviews.
+
+**Key Fields:**
+- `Id` (PK): Unique identifier
+- `InstructorId` (FK): Rated instructor
+- `StudentId` (FK): Rating student
+- `BookingId` (FK): Associated booking
+- `Rating`: 1-5 star rating
+- `Review`: Review text
+- `IsPublic`: Public visibility flag
+
+**Business Rules:**
+- One rating per booking
+- Rating range 1-5 stars
+- Public/private review options
+
+**Indexes:**
+- Index on `InstructorId` for instructor ratings
+- Index on `StudentId` for student ratings
+- Index on `BookingId` for booking-specific ratings
+- Index on `Rating` for rating analytics
+
+### CourseRatings Table
+
+Course feedback system with reviews.
+
+**Key Fields:**
+- `Id` (PK): Unique identifier
+- `CourseId` (FK): Rated course
+- `StudentId` (FK): Rating student
+- `Rating`: 1-5 star rating
+- `Review`: Review text
+- `IsPublic`: Public visibility flag
+
+**Business Rules:**
+- One rating per student per course
+- Rating range 1-5 stars
+- Public/private review options
+
+**Indexes:**
+- Index on `CourseId` for course ratings
+- Index on `StudentId` for student ratings
+- Index on `Rating` for rating analytics
 
 ## Enums
 
@@ -201,30 +378,35 @@ Comprehensive audit trail for all critical operations.
 - `Cancelled = 2`: Booking cancelled
 - `Completed = 3`: Session completed
 - `NoShow = 4`: Student didn't attend
+- `Rescheduled = 5`: Booking was rescheduled
 
 ### PaymentStatus
-- `Pending = 0`: Payment initiated
-- `Succeeded = 1`: Payment completed successfully
+- `Pending = 0`: Payment processing
+- `Succeeded = 1`: Payment successful
 - `Failed = 2`: Payment failed
 - `Cancelled = 3`: Payment cancelled
-- `Refunded = 4`: Payment refunded
+- `Refunded = 4`: Full refund processed
+- `PartiallyRefunded = 5`: Partial refund processed
 
 ### PaymentProvider
-- `Stripe = 0`: Stripe payment processor
-- `PayPal = 1`: PayPal payment processor
+- `Stripe = 0`: Stripe payment processing
+- `PayPal = 1`: PayPal payment processing
 
 ### NotificationType
-- `BookingConfirmation = 0`: Booking confirmed notification
-- `BookingReminder = 1`: Upcoming booking reminder
-- `BookingCancellation = 2`: Booking cancelled notification
+- `BookingConfirmation = 0`: Booking confirmed
+- `BookingReminder = 1`: Session reminder
+- `BookingCancellation = 2`: Booking cancelled
 - `PaymentConfirmation = 3`: Payment successful
 - `PaymentFailed = 4`: Payment failed
-- `CoursePublished = 5`: New course available
-- `EmailVerification = 6`: Email verification required
-- `PasswordReset = 7`: Password reset request
-- `GeneralAnnouncement = 8`: System announcements
-- `BookingRescheduled = 9`: Booking time changed
-- `CourseUpdated = 10`: Course content updated
+- `CoursePublished = 5`: Course published
+- `EmailVerification = 6`: Email verification
+- `PasswordReset = 7`: Password reset
+- `GeneralAnnouncement = 8`: System announcement
+- `BookingRescheduled = 9`: Booking rescheduled
+- `CourseUpdated = 10`: Course updated
+- `SessionReminder = 11`: Session reminder
+- `CourseCompleted = 12`: Course completed
+- `InstructorRating = 13`: Instructor rated
 
 ### AuditActionType
 - `Create = 0`: Entity created
@@ -234,84 +416,56 @@ Comprehensive audit trail for all critical operations.
 - `Logout = 4`: User logout
 - `EmailConfirmation = 5`: Email confirmed
 - `PasswordReset = 6`: Password reset
+- `BookingCreated = 7`: Booking created
+- `BookingUpdated = 8`: Booking updated
+- `PaymentProcessed = 9`: Payment processed
 
-## Key Relationships
+### DiscountType
+- `Percentage = 0`: Percentage discount
+- `FixedAmount = 1`: Fixed amount discount
 
-1. **User → Course**: One instructor can create many courses
-2. **Course → CourseMaterial**: One course can have many materials
-3. **Course → AvailabilitySlot**: One course can have many time slots
-4. **AvailabilitySlot → Booking**: One slot can have one booking
-5. **Booking → Payment**: One booking can have multiple payments (refunds)
-6. **User → Enrollment**: One student can enroll in many courses
-7. **User → Notification**: One user can have many notifications
-8. **User → AuditLog**: One user can perform many logged actions
+## Performance Optimizations
 
-## Performance Considerations
-
-### Indexing Strategy
-- Primary keys on all tables (clustered)
-- Foreign key indexes for join performance
-- Composite indexes for common query patterns
-- Covering indexes for frequently accessed columns
+### Strategic Indexing
+- **Composite Indexes**: Multi-column indexes for common query patterns
+- **Covering Indexes**: Include frequently accessed columns
+- **Soft Delete Optimization**: Efficient filtering of deleted records
+- **Time-based Queries**: Optimized for date range searches
 
 ### Query Optimization
-- Pagination for large result sets
-- Filtered indexes for boolean columns
-- Partitioning consideration for audit logs by date
+- **Foreign Key Indexes**: All foreign keys indexed
+- **Status-based Queries**: Indexes on status fields
+- **Time-based Filtering**: Indexes on timestamp fields
+- **Unique Constraints**: Prevent data integrity issues
 
-### Caching Strategy
-- Cache published courses for public browsing
-- Cache user sessions and permissions
-- Cache availability slots for booking interface
-- Invalidate caches on relevant updates
+## Security Features
 
-## Data Integrity Rules
+### User Security
+- **Account Locking**: Failed login attempt tracking
+- **Session Management**: Secure session handling with expiration
+- **Password Reset**: Secure token-based password reset
+- **Soft Deletes**: Data preservation with deletion tracking
 
-### Referential Integrity
-- All foreign keys enforced at database level
-- Cascade rules defined for dependent records
-- Check constraints on enum values
-
-### Business Rules
-- Email uniqueness across all users
-- One booking per availability slot
-- Booking confirmation requires successful payment
-- Instructor can only manage their own courses/slots
-
-### Temporal Constraints
-- Availability slots must have EndTime > StartTime
-- Booking times must be in the future when created
-- Payment timestamps must be logical (created ≤ processed)
-
-## Security Considerations
-
-### Data Protection
-- Password hashes never stored in plain text
-- Sensitive audit data encrypted at rest
-- PII data minimization and anonymization options
-
-### Access Control
-- Role-based permissions enforced in application layer
-- Row-level security for multi-tenant scenarios
-- API key and JWT token validation
-
-### Audit Requirements
-- All data modifications logged
-- User actions tracked with IP and user agent
-- Compliance with data protection regulations
+### Audit & Compliance
+- **Comprehensive Logging**: All critical operations logged
+- **Change Tracking**: Before/after JSON for all modifications
+- **Security Context**: IP address and user agent tracking
+- **Immutable Records**: Audit logs cannot be modified
 
 ## Migration Strategy
 
-### Initial Setup
-1. Create database and schema
-2. Apply all table creation scripts
-3. Create indexes and constraints
-4. Seed reference data (admin users, etc.)
+### Backward Compatibility
+- All existing fields preserved
+- Sensible defaults for new required fields
+- Gradual migration path for existing data
+- Non-blocking index creation for production
 
-### Future Changes
-- Use Entity Framework migrations
-- Version control all schema changes
-- Test migrations in staging environment
-- Plan for zero-downtime deployments
+### Data Migration
+- **Phase 1**: Add new tables and fields
+- **Phase 2**: Migrate existing data to new structure
+- **Phase 3**: Enable new features
+- **Phase 4**: Clean up deprecated fields
 
-This schema provides a robust foundation for the MedicalEdu platform, supporting all the required functionality while maintaining data integrity, performance, and security standards. 
+---
+
+**Optimized Database Schema** - Comprehensive guide to the enhanced MedicalEdu data architecture with advanced features and performance optimizations. 

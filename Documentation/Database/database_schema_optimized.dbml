@@ -1,4 +1,4 @@
-// MedicalEdu Database Schema for dbdiagram.io
+// MedicalEdu Database Schema - Optimized Version for dbdiagram.io
 // Copy and paste this into https://dbdiagram.io/d
 
 Table users {
@@ -9,13 +9,19 @@ Table users {
   role user_role [not null]
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
+  deleted_at timestamp [note: 'Soft delete timestamp']
   is_active boolean [not null, default: true]
   email_confirmed boolean [not null, default: false]
   email_confirmation_token varchar(255)
   email_confirmation_token_expiry timestamp
-  time_zone varchar(50)
+  password_reset_token varchar(255)
+  password_reset_token_expiry timestamp
+  time_zone varchar(50) [not null, default: 'UTC']
   phone_number varchar(20)
   profile_picture_url text
+  last_login_at timestamp
+  failed_login_attempts int [not null, default: 0]
+  locked_until timestamp
 }
 
 Table courses {
@@ -23,11 +29,20 @@ Table courses {
   instructor_id uuid [not null, ref: > users.id]
   title varchar(200) [not null]
   description text
+  short_description varchar(500)
   is_published boolean [not null, default: false]
-  price decimal(10,2)
+  price decimal(10,2) [not null, default: 0]
+  currency varchar(3) [not null, default: 'USD']
   thumbnail_url text
+  video_intro_url text
+  duration_minutes int
+  max_students int
+  category varchar(100)
+  tags text [note: 'JSON array of tags']
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
+  published_at timestamp
+  deleted_at timestamp [note: 'Soft delete timestamp']
 }
 
 Table course_materials {
@@ -41,6 +56,8 @@ Table course_materials {
   file_size_bytes bigint [not null]
   "order" int [not null]
   is_free boolean [not null, default: false]
+  duration_minutes int [note: 'For video content']
+  is_required boolean [not null, default: true]
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 }
@@ -53,19 +70,23 @@ Table availability_slots {
   end_time_utc timestamp [not null]
   is_booked boolean [not null, default: false]
   price decimal(10,2) [not null]
+  currency varchar(3) [not null, default: 'USD']
+  max_participants int [not null, default: 1]
+  current_participants int [not null, default: 0]
   notes text
+  is_recurring boolean [not null, default: false]
+  recurring_pattern json [note: 'For recurring slots']
   created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 }
 
 Table bookings {
   id uuid [pk]
-  course_id uuid [not null, ref: > courses.id]
   student_id uuid [not null, ref: > users.id]
-  instructor_id uuid [not null, ref: > users.id]
   availability_slot_id uuid [not null, ref: > availability_slots.id]
   status booking_status [not null, default: 'pending']
   amount decimal(10,2) [not null]
+  currency varchar(3) [not null, default: 'USD']
   student_notes text
   instructor_notes text
   created_at timestamp [not null, default: `now()`]
@@ -73,6 +94,9 @@ Table bookings {
   confirmed_at timestamp
   cancelled_at timestamp
   cancellation_reason text
+  rescheduled_from_booking_id uuid [ref: > bookings.id, note: 'For rescheduled bookings']
+  meeting_url text [note: 'For virtual sessions']
+  meeting_notes text [note: 'Post-session notes']
 }
 
 Table payments {
@@ -91,6 +115,7 @@ Table payments {
   processed_at timestamp
   refunded_at timestamp
   refund_amount decimal(10,2)
+  refund_reason text
 }
 
 Table enrollments {
@@ -101,6 +126,18 @@ Table enrollments {
   is_active boolean [not null, default: true]
   progress_percentage int [not null, default: 0]
   completed_at timestamp
+  last_accessed_at timestamp
+  updated_at timestamp
+}
+
+Table course_progress {
+  id uuid [pk]
+  enrollment_id uuid [not null, ref: > enrollments.id]
+  course_material_id uuid [not null, ref: > course_materials.id]
+  is_completed boolean [not null, default: false]
+  completed_at timestamp
+  time_spent_seconds int [not null, default: 0]
+  created_at timestamp [not null, default: `now()`]
   updated_at timestamp
 }
 
@@ -113,9 +150,14 @@ Table notifications {
   is_read boolean [not null, default: false]
   email_sent boolean [not null, default: false]
   email_sent_at timestamp
+  sms_sent boolean [not null, default: false]
+  sms_sent_at timestamp
+  push_sent boolean [not null, default: false]
+  push_sent_at timestamp
   related_entity_id uuid
   related_entity_type varchar(50)
   metadata json
+  scheduled_for timestamp [note: 'For scheduled notifications']
   created_at timestamp [not null, default: `now()`]
   read_at timestamp
 }
@@ -134,6 +176,65 @@ Table audit_logs {
   created_at timestamp [not null, default: `now()`]
 }
 
+Table promo_codes {
+  id uuid [pk]
+  code varchar(50) [not null, unique]
+  description text
+  discount_type discount_type [not null]
+  discount_value decimal(10,2) [not null]
+  currency varchar(3) [not null, default: 'USD']
+  max_uses int
+  current_uses int [not null, default: 0]
+  valid_from timestamp [not null]
+  valid_until timestamp [not null]
+  is_active boolean [not null, default: true]
+  applicable_course_ids json [note: 'JSON array of course IDs, null for all courses']
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+}
+
+Table booking_promo_codes {
+  id uuid [pk]
+  booking_id uuid [not null, ref: > bookings.id]
+  promo_code_id uuid [not null, ref: > promo_codes.id]
+  discount_amount decimal(10,2) [not null]
+  created_at timestamp [not null, default: `now()`]
+}
+
+Table user_sessions {
+  id uuid [pk]
+  user_id uuid [not null, ref: > users.id]
+  session_token varchar(255) [not null, unique]
+  ip_address varchar(45)
+  user_agent varchar(500)
+  expires_at timestamp [not null]
+  created_at timestamp [not null, default: `now()`]
+  last_activity_at timestamp [not null, default: `now()`]
+}
+
+Table instructor_ratings {
+  id uuid [pk]
+  instructor_id uuid [not null, ref: > users.id]
+  student_id uuid [not null, ref: > users.id]
+  booking_id uuid [not null, ref: > bookings.id]
+  rating int [not null, note: '1-5 stars']
+  review text
+  is_public boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+}
+
+Table course_ratings {
+  id uuid [pk]
+  course_id uuid [not null, ref: > courses.id]
+  student_id uuid [not null, ref: > users.id]
+  rating int [not null, note: '1-5 stars']
+  review text
+  is_public boolean [not null, default: true]
+  created_at timestamp [not null, default: `now()`]
+  updated_at timestamp
+}
+
 // Enums
 Enum user_role {
   admin
@@ -147,6 +248,7 @@ Enum booking_status {
   cancelled
   completed
   no_show
+  rescheduled
 }
 
 Enum payment_status {
@@ -155,6 +257,7 @@ Enum payment_status {
   failed
   cancelled
   refunded
+  partially_refunded
 }
 
 Enum payment_provider {
@@ -166,14 +269,17 @@ Enum notification_type {
   booking_confirmation
   booking_reminder
   booking_cancellation
+  booking_rescheduled
   payment_confirmation
   payment_failed
   course_published
   email_verification
   password_reset
   general_announcement
-  booking_rescheduled
   course_updated
+  session_reminder
+  course_completed
+  instructor_rating
 }
 
 Enum audit_action_type {
@@ -184,6 +290,14 @@ Enum audit_action_type {
   logout
   email_confirmation
   password_reset
+  booking_created
+  booking_updated
+  payment_processed
+}
+
+Enum discount_type {
+  percentage
+  fixed_amount
 }
 
 // Indexes for performance
@@ -191,30 +305,75 @@ Indexes {
   (users.email) [unique]
   (users.role)
   (users.email_confirmed)
+  (users.deleted_at)
+  (users.is_active)
+  (users.last_login_at)
+  
   (courses.instructor_id)
   (courses.is_published)
   (courses.is_published, courses.created_at)
+  (courses.deleted_at)
+  (courses.category)
+  
   (course_materials.course_id)
   (course_materials.course_id, course_materials.order)
+  (course_materials.is_free)
+  
   (availability_slots.instructor_id)
   (availability_slots.course_id)
   (availability_slots.is_booked, availability_slots.start_time_utc)
   (availability_slots.start_time_utc)
+  (availability_slots.instructor_id, availability_slots.start_time_utc)
+  
   (bookings.student_id)
-  (bookings.instructor_id)
-  (bookings.status)
   (bookings.availability_slot_id)
+  (bookings.status)
+  (bookings.created_at)
+  (bookings.rescheduled_from_booking_id)
+  
   (payments.booking_id)
   (payments.provider_transaction_id)
   (payments.status)
+  (payments.user_id)
+  
   (enrollments.student_id, enrollments.course_id) [unique]
   (enrollments.student_id)
   (enrollments.course_id)
+  (enrollments.is_active)
+  
+  (course_progress.enrollment_id)
+  (course_progress.course_material_id)
+  (course_progress.is_completed)
+  
   (notifications.user_id)
   (notifications.type)
   (notifications.is_read)
+  (notifications.scheduled_for)
+  (notifications.created_at)
+  
   (audit_logs.entity_name)
   (audit_logs.entity_id)
   (audit_logs.user_id)
   (audit_logs.created_at)
+  (audit_logs.action)
+  
+  (promo_codes.code) [unique]
+  (promo_codes.is_active)
+  (promo_codes.valid_until)
+  
+  (booking_promo_codes.booking_id)
+  (booking_promo_codes.promo_code_id)
+  
+  (user_sessions.user_id)
+  (user_sessions.session_token) [unique]
+  (user_sessions.expires_at)
+  
+  (instructor_ratings.instructor_id)
+  (instructor_ratings.student_id)
+  (instructor_ratings.booking_id)
+  (instructor_ratings.rating)
+  
+  (course_ratings.course_id)
+  (course_ratings.student_id)
+  (course_ratings.rating)
 } 

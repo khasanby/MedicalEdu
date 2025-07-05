@@ -5,6 +5,10 @@ namespace MedicalEdu.Domain.Entities;
 
 public sealed class CourseMaterial : IEntity<Guid>
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the course material.
+    /// </summary>
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the course identifier this material belongs to.
@@ -22,7 +26,6 @@ public sealed class CourseMaterial : IEntity<Guid>
     /// <summary>
     /// Gets or sets the description of the material.
     /// </summary>
-    [MaxLength(500)]
     public string? Description { get; set; }
 
     /// <summary>
@@ -51,9 +54,9 @@ public sealed class CourseMaterial : IEntity<Guid>
     public long FileSizeBytes { get; set; }
 
     /// <summary>
-    /// Gets or sets the order/sequence of this material within the course.
+    /// Gets or sets the sort index/order of this material within the course.
     /// </summary>
-    public int Order { get; set; }
+    public int SortIndex { get; set; }
 
     /// <summary>
     /// Gets or sets whether this material is free or requires payment/enrollment.
@@ -61,10 +64,31 @@ public sealed class CourseMaterial : IEntity<Guid>
     public bool IsFree { get; set; }
 
     /// <summary>
+    /// Gets or sets the duration of the material in minutes (for video content).
+    /// </summary>
+    public int? DurationMinutes { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether this material is required for course completion.
+    /// </summary>
+    public bool IsRequired { get; set; } = true;
+
+    /// <summary>
+    /// Gets or sets the date and time when the material was created.
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
+
+    /// <summary>
     /// Gets or sets the date and time when the material was last updated.
     /// </summary>
     public DateTime? UpdatedAt { get; set; }
 
+    // Audit fields from IEntity
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
+
     // Navigation property
     public virtual Course Course { get; set; }
+    public virtual ICollection<CourseProgress> CourseProgresses { get; set; } = new List<CourseProgress>();
 }

@@ -6,6 +6,10 @@ namespace MedicalEdu.Domain.Entities;
 
 public sealed class Payment : IEntity<Guid>
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the payment.
+    /// </summary>
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the booking identifier this payment is for.
@@ -62,10 +66,12 @@ public sealed class Payment : IEntity<Guid>
     /// <summary>
     /// Gets or sets the failure reason if payment failed.
     /// </summary>
-    [MaxLength(500)]
     public string? FailureReason { get; set; }
 
-
+    /// <summary>
+    /// Gets or sets the date and time when the payment was created.
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the payment was processed.
@@ -81,6 +87,16 @@ public sealed class Payment : IEntity<Guid>
     /// Gets or sets the refund amount if applicable.
     /// </summary>
     public decimal? RefundAmount { get; set; }
+
+    /// <summary>
+    /// Gets or sets the reason for the refund.
+    /// </summary>
+    public string? RefundReason { get; set; }
+
+    // Audit fields from IEntity
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
 
     // Navigation properties
     public virtual Booking Booking { get; set; }

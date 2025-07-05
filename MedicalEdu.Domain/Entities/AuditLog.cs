@@ -6,6 +6,10 @@ namespace MedicalEdu.Domain.Entities;
 
 public sealed class AuditLog : IEntity<Guid>
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the audit log entry.
+    /// </summary>
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the name of the entity that was modified.
@@ -58,7 +62,15 @@ public sealed class AuditLog : IEntity<Guid>
     /// </summary>
     public string? Metadata { get; set; }
 
+    /// <summary>
+    /// Gets or sets the date and time when the audit log entry was created.
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
 
+    // Audit fields from IEntity
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
 
     // Navigation property
     public virtual User? User { get; set; }

@@ -6,6 +6,10 @@ namespace MedicalEdu.Domain.Entities;
 
 public sealed class Notification : IEntity<Guid>
 {
+    /// <summary>
+    /// Gets or sets the unique identifier for the notification.
+    /// </summary>
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets or sets the user identifier this notification is for.
@@ -29,7 +33,6 @@ public sealed class Notification : IEntity<Guid>
     /// Gets or sets the notification message.
     /// </summary>
     [Required]
-    [MaxLength(1000)]
     public string Message { get; set; }
 
     /// <summary>
@@ -48,6 +51,26 @@ public sealed class Notification : IEntity<Guid>
     public DateTime? EmailSentAt { get; set; }
 
     /// <summary>
+    /// Gets or sets whether an SMS was sent for this notification.
+    /// </summary>
+    public bool SmsSent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the SMS was sent.
+    /// </summary>
+    public DateTime? SmsSentAt { get; set; }
+
+    /// <summary>
+    /// Gets or sets whether a push notification was sent.
+    /// </summary>
+    public bool PushSent { get; set; }
+
+    /// <summary>
+    /// Gets or sets the date and time when the push notification was sent.
+    /// </summary>
+    public DateTime? PushSentAt { get; set; }
+
+    /// <summary>
     /// Gets or sets related entity identifier (booking, course, etc.).
     /// </summary>
     public Guid? RelatedEntityId { get; set; }
@@ -63,12 +86,25 @@ public sealed class Notification : IEntity<Guid>
     /// </summary>
     public string? Metadata { get; set; }
 
+    /// <summary>
+    /// Gets or sets the date and time when the notification should be sent (for scheduled notifications).
+    /// </summary>
+    public DateTime? ScheduledFor { get; set; }
 
+    /// <summary>
+    /// Gets or sets the date and time when the notification was created.
+    /// </summary>
+    public DateTime CreatedAt { get; set; }
 
     /// <summary>
     /// Gets or sets the date and time when the notification was read.
     /// </summary>
     public DateTime? ReadAt { get; set; }
+
+    // Audit fields from IEntity
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModified { get; set; }
+    public string? LastModifiedBy { get; set; }
 
     // Navigation property
     public virtual User User { get; set; }

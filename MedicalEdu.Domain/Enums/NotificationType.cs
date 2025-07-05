@@ -12,5 +12,8 @@ public enum NotificationType
     PasswordReset = 7,
     GeneralAnnouncement = 8,
     BookingRescheduled = 9,
-    CourseUpdated = 10
+    CourseUpdated = 10,
+    SessionReminder = 11,
+    CourseCompleted = 12,
+    InstructorRating = 13
 } 

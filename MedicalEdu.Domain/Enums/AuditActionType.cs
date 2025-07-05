@@ -8,5 +8,8 @@ public enum AuditActionType
     Login = 3,
     Logout = 4,
     EmailConfirmation = 5,
-    PasswordReset = 6
+    PasswordReset = 6,
+    BookingCreated = 7,
+    BookingUpdated = 8,
+    PaymentProcessed = 9
 } 
