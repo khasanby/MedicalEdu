@@ -13,20 +13,20 @@ public interface IEntity
     /// <summary>
     /// Gets or sets the unique identifier for the entity.
     /// </summary>
-    public DateTimeOffset CreatedAt { get; set; }
+    public DateTimeOffset CreatedAt { get; }
 
     /// <summary>
     /// Gets or sets the user who created the entity.
     /// </summary>
-    public string? CreatedBy { get; set; }
+    public string? CreatedBy { get; }
 
     /// <summary>
     /// Gets or sets the date and time when the entity was last modified.
     /// </summary>
-    public DateTimeOffset? LastModified { get; set; }
+    public DateTimeOffset? LastModified { get; }
 
     /// <summary>
     /// Gets or sets the user who last modified the entity.
     /// </summary>
-    public string? LastModifiedBy { get; set; }
+    public string? LastModifiedBy { get; }
 }
