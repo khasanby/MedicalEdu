@@ -1,5 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.RegularExpressions;
 
 namespace MedicalEdu.Domain.ValueObjects;
 
@@ -84,4 +83,4 @@ public sealed class Email : IEquatable<Email>
     {
         return !(left == right);
     }
-} 
+}
