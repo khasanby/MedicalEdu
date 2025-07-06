@@ -1,3 +1,4 @@
+using MedicalEdu.Domain.Enums;
 using MedicalEdu.Domain.ValueObjects;
 
 namespace MedicalEdu.Domain.Entities;
@@ -175,5 +176,13 @@ public sealed partial class Course
         var slots = AvailabilitySlots.Where(s => s.Id != slotId).ToList();
         AvailabilitySlots = slots.AsReadOnly();
         UpdatedAt = DateTimeOffset.UtcNow;
+    }
+
+    internal void UpdateDifficultyLevel(DifficultyLevel newLevel, string? modifiedBy = null)
+    {
+        DifficultyLevel = newLevel;
+        UpdatedAt = DateTimeOffset.UtcNow;
+        LastModified = DateTimeOffset.UtcNow;
+        LastModifiedBy = modifiedBy;
     }
 }

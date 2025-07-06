@@ -1,5 +1,6 @@
 ﻿using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.ValueObjects;
+using MedicalEdu.Domain.Enums;
 
 namespace MedicalEdu.Domain.Entities;
 
@@ -144,12 +145,18 @@ public sealed partial class Course : IEntity<Guid>
     /// </summary>
     public bool IsActive => DeletedAt == null;
 
+    /// <summary>
+    /// Gets and sets privately the difficulty level of the course.
+    /// </summary>
+    public DifficultyLevel DifficultyLevel { get; private set; }
+
     public Course(
         Guid id,
         Guid instructorId,
         string title,
         decimal price,
         Currency currency,
+        DifficultyLevel difficultyLevel,
         string? createdBy = null)
     {
         if (id == Guid.Empty) throw new ArgumentException("Course ID is required.", nameof(id));
@@ -162,6 +169,7 @@ public sealed partial class Course : IEntity<Guid>
         InstructorId = instructorId;
         Title = title;
         Price = price;
+        DifficultyLevel = difficultyLevel;
         CreatedAt = DateTimeOffset.UtcNow;
         IsPublished = false;
         CreatedBy = createdBy;

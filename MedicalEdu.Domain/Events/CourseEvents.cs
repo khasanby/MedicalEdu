@@ -146,9 +146,9 @@ public sealed class CourseAvailabilitySlotAddedEvent : CourseEvent
     /// <summary>
     /// Gets the start time of the slot.
     /// </summary>
-    public DateTime StartTime { get; }
+    public DateTimeOffset StartTime { get; }
 
-    public CourseAvailabilitySlotAddedEvent(Guid courseId, Guid slotId, DateTime startTime) : base(courseId)
+    public CourseAvailabilitySlotAddedEvent(Guid courseId, Guid slotId, DateTimeOffset startTime) : base(courseId)
     {
         SlotId = slotId;
         StartTime = startTime;

@@ -1,5 +1,6 @@
 using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Entities;
+using MedicalEdu.Domain.Enums;
 using MedicalEdu.Domain.Events;
 using MedicalEdu.Domain.ValueObjects;
 
@@ -48,6 +49,7 @@ public sealed class CourseAggregate : IAggregateRoot<Guid>
     public string? CreatedBy => _course.CreatedBy;
     public DateTimeOffset? LastModified => _course.LastModified;
     public string? LastModifiedBy => _course.LastModifiedBy;
+    public DifficultyLevel DifficultyLevel => _course.DifficultyLevel;
 
     // Navigation properties
     public User Instructor => _course.Instructor;
@@ -67,10 +69,19 @@ public sealed class CourseAggregate : IAggregateRoot<Guid>
         Guid instructorId,
         string title,
         Money price,
+        DifficultyLevel difficultyLevel,
         string? createdBy = null)
     {
         var courseId = Guid.NewGuid();
-        var course = new Course(courseId, instructorId, title, price.Amount, price.Currency, createdBy);
+        var course = new Course(
+            courseId,
+            instructorId,
+            title,
+            price.Amount,
+            price.Currency,
+            difficultyLevel,
+            createdBy
+        );
         var aggregate = new CourseAggregate(course);
 
         aggregate.AddDomainEvent(new CourseCreatedEvent(courseId, instructorId, title));
@@ -207,6 +218,17 @@ public sealed class CourseAggregate : IAggregateRoot<Guid>
         AddDomainEvent(new CourseUpdatedEvent(_course.Id, _course.Title));
     }
 
+    /// <summary>
+    /// Updates the course difficulty level.
+    /// </summary>
+    public void UpdateDifficultyLevel(DifficultyLevel newLevel, string? modifiedBy = null)
+    {
+        if (newLevel == _course.DifficultyLevel)
+            return;
+        _course.UpdateDifficultyLevel(newLevel, modifiedBy);
+        AddDomainEvent(new CourseUpdatedEvent(_course.Id, _course.Title));
+    }
+
     #endregion
 
     #region Publishing
@@ -297,7 +319,7 @@ public sealed class CourseAggregate : IAggregateRoot<Guid>
             throw new InvalidOperationException("Availability slot already exists");
 
         _course.AddAvailabilitySlot(slot);
-        AddDomainEvent(new CourseAvailabilitySlotAddedEvent(_course.Id, slot.Id, slot.StartTime));
+        AddDomainEvent(new CourseAvailabilitySlotAddedEvent(_course.Id, slot.Id, slot.StartTimeUtc));
     }
 
     /// <summary>

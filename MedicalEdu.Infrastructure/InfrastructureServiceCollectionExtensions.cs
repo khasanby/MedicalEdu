@@ -1,17 +1,13 @@
+using MedicalEdu.Domain.DataAccess;
+using MedicalEdu.Domain.DataAccess.Repositories;
+using MedicalEdu.Infrastructure.DataAccess;
+using MedicalEdu.Infrastructure.DataAccess.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MedicalEdu.Infrastructure.DataAccess;
-using MedicalEdu.Infrastructure.DataAccess.Repositories;
-using MedicalEdu.Domain.DataAccess;
-using MedicalEdu.Domain.DataAccess.Repositories;
-using MedicalEdu.Domain.DataAccess.Services;
 
 namespace MedicalEdu.Infrastructure;
 
-/// <summary>
-/// Extension methods for registering infrastructure services in the DI container.
-/// </summary>
 public static class InfrastructureServiceCollectionExtensions
 {
     /// <summary>
@@ -37,9 +33,6 @@ public static class InfrastructureServiceCollectionExtensions
         services.AddScoped<IBookingRepository, BookingRepository>();
         services.AddScoped<IAvailabilitySlotRepository, AvailabilitySlotRepository>();
 
-        // Register application services
-        services.AddScoped<IUserService, UserService>();
-
         return services;
     }
-} 
+}

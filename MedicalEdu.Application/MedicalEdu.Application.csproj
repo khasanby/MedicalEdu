@@ -10,4 +10,8 @@
     <Folder Include="Models\" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\MedicalEdu.Domain\MedicalEdu.Domain.csproj" />
+  </ItemGroup>
+
 </Project>

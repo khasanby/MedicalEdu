@@ -15,9 +15,26 @@ public interface ICourseRepository
     public Task<List<Course>> GetAllAsync(bool? isPublished = null, bool? isActive = null, Guid? instructorId = null, CancellationToken cancellationToken = default);
 
     /// <summary>
+    /// Gets courses with pagination and filtering.
+    /// </summary>
+    /// <typeparam name="T">The type of data to return.</typeparam>
+    /// <param name="conditions">List of filter conditions.</param>
+    /// <param name="sortingFunc">Function to apply sorting.</param>
+    /// <param name="pagingOptions">Pagination options (Page, PageSize).</param>
+    /// <param name="selector">Function to select and project the data.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Tuple containing total count and array of results.</returns>
+    public Task<(int TotalCount, T[] Results)> GetWithPagingAsync<T>(
+        List<System.Linq.Expressions.Expression<Func<Course, bool>>> conditions,
+        Func<System.Linq.IQueryable<Course>, System.Linq.IQueryable<Course>> sortingFunc,
+        (int Page, int PageSize) pagingOptions,
+        System.Linq.Expressions.Expression<Func<Course, T>> selector,
+        CancellationToken cancellationToken = default);
+
+    /// <summary>
     /// Adds a new course to the repository.
     /// </summary>
-    public ValueTask AddAsync(Course course, CancellationToken cancellationToken = default);
+    public Task AddAsync(Course course, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Updates an existing course in the repository.
@@ -32,5 +49,5 @@ public interface ICourseRepository
     /// <summary>
     /// Saves all changes made in this repository to the database.
     /// </summary>
-    public ValueTask<int> SaveChangesAsync(CancellationToken cancellationToken = default);
+    public Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
 }

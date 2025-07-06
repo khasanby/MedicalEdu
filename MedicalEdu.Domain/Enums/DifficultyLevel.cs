@@ -1,8 +1,5 @@
 namespace MedicalEdu.Domain.Enums;
 
-/// <summary>
-/// Represents the difficulty level of a course.
-/// </summary>
 public enum DifficultyLevel
 {
     /// <summary>

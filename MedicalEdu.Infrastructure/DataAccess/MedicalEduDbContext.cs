@@ -1,8 +1,6 @@
-using Microsoft.EntityFrameworkCore;
-using MedicalEdu.Domain.Entities;
-using MedicalEdu.Domain.ValueObjects;
-using MedicalEdu.Domain.Enums;
 using MedicalEdu.Domain.DataAccess;
+using MedicalEdu.Domain.Entities;
+using Microsoft.EntityFrameworkCore;
 
 namespace MedicalEdu.Infrastructure.DataAccess;
 
@@ -40,28 +38,28 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         // Configure User entity
         ConfigureUser(modelBuilder);
-        
+
         // Configure Course entity
         ConfigureCourse(modelBuilder);
-        
+
         // Configure Booking entity
         ConfigureBooking(modelBuilder);
-        
+
         // Configure AvailabilitySlot entity
         ConfigureAvailabilitySlot(modelBuilder);
-        
+
         // Configure Payment entity
         ConfigurePayment(modelBuilder);
-        
+
         // Configure PromoCode entity
         ConfigurePromoCode(modelBuilder);
-        
+
         // Configure Notification entity
         ConfigureNotification(modelBuilder);
-        
+
         // Configure AuditLog entity
         ConfigureAuditLog(modelBuilder);
-        
+
         // Configure supporting entities
         ConfigureCourseMaterial(modelBuilder);
         ConfigureCourseRating(modelBuilder);
@@ -78,31 +76,31 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("Users");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
-        
+
         // Value object conversions
         entity.OwnsOne(e => e.Email, email =>
         {
             email.Property(e => e.Value).HasColumnName("Email").IsRequired().HasMaxLength(255);
         });
-        
+
         entity.OwnsOne(e => e.PasswordHash, password =>
         {
             password.Property(p => p.Hash).HasColumnName("PasswordHash").IsRequired().HasMaxLength(255);
         });
-        
+
         entity.OwnsOne(e => e.Zone, zone =>
         {
-            zone.Property(z => z.Value).HasColumnName("TimeZone").IsRequired().HasMaxLength(50);
+            zone.Property(z => z.Id).HasColumnName("TimeZone").IsRequired().HasMaxLength(50);
         });
-        
+
         entity.OwnsOne(e => e.PhoneNumber, phone =>
         {
             phone.Property(p => p.Value).HasColumnName("PhoneNumber").HasMaxLength(20);
         });
-        
+
         entity.OwnsOne(e => e.ProfilePictureUrl, url =>
         {
             url.Property(u => u.Value).HasColumnName("ProfilePictureUrl").HasMaxLength(500);
@@ -112,7 +110,6 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.Property(e => e.CreatedAt).IsRequired();
         entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.DeletedAt);
-        entity.Property(e => e.IsActive).IsRequired();
         entity.Property(e => e.EmailConfirmed).IsRequired();
         entity.Property(e => e.EmailConfirmationToken).HasMaxLength(255);
         entity.Property(e => e.EmailConfirmationTokenExpiry);
@@ -137,35 +134,23 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("Courses");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
         entity.Property(e => e.Description).HasMaxLength(2000);
         entity.Property(e => e.ShortDescription).HasMaxLength(500);
-        
-        // Value object conversions
-        entity.OwnsOne(e => e.Price, price =>
-        {
-            price.Property(p => p.Amount).HasColumnName("Price").IsRequired();
-            price.OwnsOne(p => p.Currency, currency =>
-            {
-                currency.Property(c => c.Code).HasColumnName("CurrencyCode").IsRequired().HasMaxLength(3);
-            });
-        });
-        
-        entity.OwnsOne(e => e.ThumbnailUrl, url =>
-        {
-            url.Property(u => u.Value).HasColumnName("ThumbnailUrl").HasMaxLength(500);
-        });
 
         entity.Property(e => e.InstructorId).IsRequired();
-        entity.Property(e => e.Category).IsRequired();
+        entity.Property(e => e.Category).HasMaxLength(100);
         entity.Property(e => e.DifficultyLevel).IsRequired();
-        entity.Property(e => e.Duration).IsRequired();
-        entity.Property(e => e.MaxStudents).IsRequired();
-        entity.Property(e => e.CurrentStudents).IsRequired();
+        entity.Property(e => e.DurationMinutes);
+        entity.Property(e => e.MaxStudents);
         entity.Property(e => e.IsPublished).IsRequired();
-        entity.Property(e => e.IsActive).IsRequired();
+        entity.Property(e => e.Price).IsRequired();
+        entity.Property(e => e.Currency).IsRequired();
+        entity.Property(e => e.ThumbnailUrl).HasMaxLength(500);
+        entity.Property(e => e.VideoIntroUrl).HasMaxLength(500);
+        entity.Property(e => e.Tags).HasMaxLength(500);
         entity.Property(e => e.CreatedAt).IsRequired();
         entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.PublishedAt);
@@ -183,7 +168,6 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.HasIndex(e => e.InstructorId);
         entity.HasIndex(e => e.Category);
         entity.HasIndex(e => e.IsPublished);
-        entity.HasIndex(e => e.IsActive);
     }
 
     private void ConfigureBooking(ModelBuilder modelBuilder)
@@ -192,13 +176,13 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("Bookings");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.StudentId).IsRequired();
         entity.Property(e => e.AvailabilitySlotId).IsRequired();
         entity.Property(e => e.Status).IsRequired();
         entity.Property(e => e.Amount).IsRequired();
-        
+
         // Value object conversion
         entity.OwnsOne(e => e.Currency, currency =>
         {
@@ -243,7 +227,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("AvailabilitySlots");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.CourseId).IsRequired();
         entity.Property(e => e.InstructorId).IsRequired();
@@ -251,7 +235,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.Property(e => e.EndTimeUtc).IsRequired();
         entity.Property(e => e.IsBooked).IsRequired();
         entity.Property(e => e.Price).IsRequired();
-        
+
         // Value object conversion
         entity.OwnsOne(e => e.Currency, currency =>
         {
@@ -293,49 +277,54 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("Payments");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.BookingId).IsRequired();
-        entity.Property(e => e.StudentId).IsRequired();
+        entity.Property(e => e.UserId).IsRequired();
         entity.Property(e => e.Amount).IsRequired();
-        
-        // Value object conversion
+
+        // Value object conversion for Currency
         entity.OwnsOne(e => e.Currency, currency =>
         {
-            currency.Property(c => c.Code).HasColumnName("CurrencyCode").IsRequired().HasMaxLength(3);
+            currency.Property(c => c.Code)
+                .HasColumnName("CurrencyCode")
+                .IsRequired()
+                .HasMaxLength(3);
         });
 
         entity.Property(e => e.Status).IsRequired();
         entity.Property(e => e.Provider).IsRequired();
-        entity.Property(e => e.TransactionId).HasMaxLength(255);
-        entity.Property(e => e.ProviderTransactionId).HasMaxLength(255);
+        entity.Property(e => e.ProviderTransactionId).HasMaxLength(255).IsRequired();
+        entity.Property(e => e.ProviderPaymentIntentId).HasMaxLength(255);
+        entity.Property(e => e.ProviderMetadata).HasMaxLength(1000);
         entity.Property(e => e.FailureReason).HasMaxLength(500);
+        entity.Property(e => e.RefundAmount);
+        entity.Property(e => e.RefundReason).HasMaxLength(500);
         entity.Property(e => e.CreatedAt).IsRequired();
-        entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.ProcessedAt);
-        entity.Property(e => e.FailedAt);
         entity.Property(e => e.RefundedAt);
+        entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.CreatedBy).HasMaxLength(100);
         entity.Property(e => e.LastModified);
         entity.Property(e => e.LastModifiedBy).HasMaxLength(100);
 
         // Relationships
-        entity.HasOne<Booking>()
+        entity.HasOne(e => e.Booking)
             .WithMany(b => b.Payments)
             .HasForeignKey(e => e.BookingId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        entity.HasOne<User>()
+        entity.HasOne(e => e.User)
             .WithMany(u => u.Payments)
-            .HasForeignKey(e => e.StudentId)
+            .HasForeignKey(e => e.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes
         entity.HasIndex(e => e.BookingId);
-        entity.HasIndex(e => e.StudentId);
+        entity.HasIndex(e => e.UserId);
         entity.HasIndex(e => e.Status);
-        entity.HasIndex(e => e.TransactionId);
         entity.HasIndex(e => e.ProviderTransactionId);
+        entity.HasIndex(e => e.ProviderPaymentIntentId);
     }
 
     private void ConfigurePromoCode(ModelBuilder modelBuilder)
@@ -344,7 +333,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("PromoCodes");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.Code).IsRequired().HasMaxLength(50);
         entity.Property(e => e.Description).HasMaxLength(500);
@@ -374,7 +363,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("Notifications");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.UserId).IsRequired();
         entity.Property(e => e.Type).IsRequired();
@@ -383,7 +372,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.Property(e => e.IsRead).IsRequired();
         entity.Property(e => e.ReadAt);
         entity.Property(e => e.CreatedAt).IsRequired();
-        entity.Property(e => e.UpdatedAt);
+        entity.Property(e => e.LastModified);
         entity.Property(e => e.CreatedBy).HasMaxLength(100);
         entity.Property(e => e.LastModified);
         entity.Property(e => e.LastModifiedBy).HasMaxLength(100);
@@ -407,7 +396,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("AuditLogs");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.EntityName).IsRequired().HasMaxLength(100);
         entity.Property(e => e.EntityId).IsRequired();
@@ -433,14 +422,19 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("CourseMaterials");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.CourseId).IsRequired();
         entity.Property(e => e.Title).IsRequired().HasMaxLength(200);
         entity.Property(e => e.Description).HasMaxLength(1000);
-        entity.Property(e => e.Type).IsRequired();
-        entity.Property(e => e.Order).IsRequired();
-        entity.Property(e => e.IsActive).IsRequired();
+        entity.Property(e => e.FileUrl).IsRequired();
+        entity.Property(e => e.FileName).IsRequired();
+        entity.Property(e => e.ContentType).IsRequired();
+        entity.Property(e => e.FileSizeBytes).IsRequired();
+        entity.Property(e => e.SortIndex).IsRequired();
+        entity.Property(e => e.IsFree).IsRequired();
+        entity.Property(e => e.DurationMinutes);
+        entity.Property(e => e.IsRequired).IsRequired();
         entity.Property(e => e.CreatedAt).IsRequired();
         entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.CreatedBy).HasMaxLength(100);
@@ -448,15 +442,14 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.Property(e => e.LastModifiedBy).HasMaxLength(100);
 
         // Relationships
-        entity.HasOne<Course>()
-            .WithMany(c => c.Materials)
+        entity.HasOne(e => e.Course)
+            .WithMany(c => c.CourseMaterials)
             .HasForeignKey(e => e.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
         // Indexes
         entity.HasIndex(e => e.CourseId);
-        entity.HasIndex(e => e.Type);
-        entity.HasIndex(e => e.Order);
+        entity.HasIndex(e => e.SortIndex);
     }
 
     private void ConfigureCourseRating(ModelBuilder modelBuilder)
@@ -465,12 +458,13 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("CourseRatings");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.CourseId).IsRequired();
         entity.Property(e => e.StudentId).IsRequired();
         entity.Property(e => e.Rating).IsRequired();
-        entity.Property(e => e.Comment).HasMaxLength(1000);
+        entity.Property(e => e.Review).HasMaxLength(1000);
+        entity.Property(e => e.IsPublic).IsRequired();
         entity.Property(e => e.CreatedAt).IsRequired();
         entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.CreatedBy).HasMaxLength(100);
@@ -478,12 +472,12 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.Property(e => e.LastModifiedBy).HasMaxLength(100);
 
         // Relationships
-        entity.HasOne<Course>()
-            .WithMany(c => c.Ratings)
+        entity.HasOne(e => e.Course)
+            .WithMany(c => c.CourseRatings)
             .HasForeignKey(e => e.CourseId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        entity.HasOne<User>()
+        entity.HasOne(e => e.Student)
             .WithMany(u => u.CourseRatings)
             .HasForeignKey(e => e.StudentId)
             .OnDelete(DeleteBehavior.Restrict);
@@ -500,12 +494,13 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("CourseProgresses");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
-        entity.Property(e => e.CourseId).IsRequired();
-        entity.Property(e => e.StudentId).IsRequired();
-        entity.Property(e => e.ProgressPercentage).IsRequired();
+        entity.Property(e => e.EnrollmentId).IsRequired();
+        entity.Property(e => e.CourseMaterialId).IsRequired();
+        entity.Property(e => e.IsCompleted).IsRequired();
         entity.Property(e => e.CompletedAt);
+        entity.Property(e => e.TimeSpentSeconds).IsRequired();
         entity.Property(e => e.CreatedAt).IsRequired();
         entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.CreatedBy).HasMaxLength(100);
@@ -513,20 +508,20 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.Property(e => e.LastModifiedBy).HasMaxLength(100);
 
         // Relationships
-        entity.HasOne<Course>()
-            .WithMany(c => c.Progresses)
-            .HasForeignKey(e => e.CourseId)
+        entity.HasOne(e => e.Enrollment)
+            .WithMany()
+            .HasForeignKey(e => e.EnrollmentId)
             .OnDelete(DeleteBehavior.Cascade);
 
-        entity.HasOne<User>()
-            .WithMany(u => u.CourseProgresses)
-            .HasForeignKey(e => e.StudentId)
+        entity.HasOne(e => e.CourseMaterial)
+            .WithMany()
+            .HasForeignKey(e => e.CourseMaterialId)
             .OnDelete(DeleteBehavior.Restrict);
 
         // Indexes
-        entity.HasIndex(e => e.CourseId);
-        entity.HasIndex(e => e.StudentId);
-        entity.HasIndex(e => e.ProgressPercentage);
+        entity.HasIndex(e => e.EnrollmentId);
+        entity.HasIndex(e => e.CourseMaterialId);
+        entity.HasIndex(e => e.IsCompleted);
     }
 
     private void ConfigureEnrollment(ModelBuilder modelBuilder)
@@ -535,11 +530,11 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("Enrollments");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.CourseId).IsRequired();
         entity.Property(e => e.StudentId).IsRequired();
-        entity.Property(e => e.Status).IsRequired();
+        entity.Property(e => e.IsActive).IsRequired();
         entity.Property(e => e.EnrolledAt).IsRequired();
         entity.Property(e => e.CompletedAt);
         entity.Property(e => e.CreatedAt).IsRequired();
@@ -562,7 +557,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         // Indexes
         entity.HasIndex(e => e.CourseId);
         entity.HasIndex(e => e.StudentId);
-        entity.HasIndex(e => e.Status);
+        entity.HasIndex(e => e.IsActive);
         entity.HasIndex(e => e.EnrolledAt);
     }
 
@@ -572,12 +567,12 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("InstructorRatings");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.InstructorId).IsRequired();
         entity.Property(e => e.StudentId).IsRequired();
         entity.Property(e => e.Rating).IsRequired();
-        entity.Property(e => e.Comment).HasMaxLength(1000);
+        entity.Property(e => e.Review).HasMaxLength(1000);
         entity.Property(e => e.CreatedAt).IsRequired();
         entity.Property(e => e.UpdatedAt);
         entity.Property(e => e.CreatedBy).HasMaxLength(100);
@@ -607,7 +602,7 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("BookingPromoCodes");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.BookingId).IsRequired();
         entity.Property(e => e.PromoCodeId).IsRequired();
@@ -637,12 +632,11 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 
         entity.ToTable("UserSessions");
         entity.HasKey(e => e.Id);
-        
+
         entity.Property(e => e.Id).ValueGeneratedNever();
         entity.Property(e => e.UserId).IsRequired();
         entity.Property(e => e.SessionToken).IsRequired().HasMaxLength(255);
         entity.Property(e => e.ExpiresAt).IsRequired();
-        entity.Property(e => e.IsActive).IsRequired();
         entity.Property(e => e.IpAddress).HasMaxLength(45);
         entity.Property(e => e.UserAgent).HasMaxLength(500);
         entity.Property(e => e.CreatedAt).IsRequired();
@@ -659,6 +653,5 @@ public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
         entity.HasIndex(e => e.UserId);
         entity.HasIndex(e => e.SessionToken).IsUnique();
         entity.HasIndex(e => e.ExpiresAt);
-        entity.HasIndex(e => e.IsActive);
     }
-} 
+}

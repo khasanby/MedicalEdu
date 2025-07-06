@@ -8,7 +8,7 @@ namespace MedicalEdu.Infrastructure.DataAccess.Repositories;
 /// <summary>
 /// Repository implementation for User entity operations.
 /// </summary>
-public class UserRepository : IUserRepository
+public sealed class UserRepository : IUserRepository
 {
     private readonly IMedicalEduDbContext _context;
 

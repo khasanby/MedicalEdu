@@ -1,7 +1,7 @@
 using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Enums;
 using MedicalEdu.Domain.ValueObjects;
-using TimeZone = MedicalEdu.Domain.ValueObjects.TimeZone;
+using TimeZone = MedicalEdu.Domain.ValueObjects.TimeZoneId;
 
 namespace MedicalEdu.Domain.Entities;
 
@@ -25,7 +25,7 @@ public sealed partial class User : IEntity<Guid>
     /// <summary>
     /// Gets and sets privately the user's hashed password (value object).
     /// </summary>
-    public Password PasswordHash { get; private set; }
+    public PasswordHash PasswordHash { get; private set; }
 
     /// <summary>
     /// Gets and sets privately the user's role (student, instructor, admin, etc.).
@@ -182,7 +182,7 @@ public sealed partial class User : IEntity<Guid>
     public IReadOnlyCollection<AvailabilitySlot> InstructorAvailabilitySlots { get; private set; } 
         = new List<AvailabilitySlot>();
 
-    public User(Guid id, string name, Email email, Password passwordHash, UserRole role, string? createdBy = null)
+    public User(Guid id, string name, Email email, PasswordHash passwordHash, UserRole role, string? createdBy = null)
     {
         if (id == Guid.Empty) throw new ArgumentException("User ID is required.", nameof(id));
         if (string.IsNullOrWhiteSpace(name)) throw new ArgumentException("Name is required.", nameof(name));

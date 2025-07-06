@@ -14,11 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\MedicalEdu.Application\MedicalEdu.Application.csproj" />
     <ProjectReference Include="..\MedicalEdu.Infrastructure\MedicalEdu.Infrastructure.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Controllers\" />
   </ItemGroup>
 
 </Project>

@@ -1,8 +1,5 @@
 namespace MedicalEdu.Domain.Enums;
 
-/// <summary>
-/// Represents the category of a course.
-/// </summary>
 public enum CourseCategory
 {
     /// <summary>
