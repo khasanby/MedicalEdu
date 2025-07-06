@@ -1,5 +1,6 @@
 using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.Enums;
+using MedicalEdu.Domain.ValueObjects;
 
 namespace MedicalEdu.Domain.Events;
 
@@ -84,4 +85,91 @@ public class UserActivatedEvent : UserEvent
     public UserActivatedEvent(Guid userId) : base(userId)
     {
     }
-} 
+}
+
+// New events for the UserAggregate
+public class UserEmailConfirmed : UserEvent
+{
+    public UserEmailConfirmed(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserPasswordChanged : UserEvent
+{
+    public UserPasswordChanged(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserLocked : UserEvent
+{
+    public DateTimeOffset LockedUntil { get; }
+
+    public UserLocked(Guid userId, DateTimeOffset lockedUntil) : base(userId)
+    {
+        LockedUntil = lockedUntil;
+    }
+}
+
+public class UserEmailConfirmationTokenRequested : UserEvent
+{
+    public SessionToken Token { get; }
+
+    public UserEmailConfirmationTokenRequested(Guid userId, SessionToken token) : base(userId)
+    {
+        Token = token;
+    }
+}
+
+public class UserPasswordResetRequested : UserEvent
+{
+    public SessionToken Token { get; }
+
+    public UserPasswordResetRequested(Guid userId, SessionToken token) : base(userId)
+    {
+        Token = token;
+    }
+}
+
+public class UserPasswordReset : UserEvent
+{
+    public UserPasswordReset(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserLoggedIn : UserEvent
+{
+    public UserLoggedIn(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserLoginFailed : UserEvent
+{
+    public UserLoginFailed(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserProfileUpdated : UserEvent
+{
+    public UserProfileUpdated(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserActivated : UserEvent
+{
+    public UserActivated(Guid userId) : base(userId)
+    {
+    }
+}
+
+public class UserDeactivated : UserEvent
+{
+    public UserDeactivated(Guid userId) : base(userId)
+    {
+    }
+}

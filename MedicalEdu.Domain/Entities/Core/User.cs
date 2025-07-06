@@ -85,12 +85,12 @@ public sealed partial class User : IEntity<Guid>
     /// <summary>
     /// Gets and sets privately the user's phone number.
     /// </summary>
-    public string? PhoneNumber { get; private set; }
+    public PhoneNumber? PhoneNumber { get; private set; }
 
     /// <summary>
     /// Gets and sets privately the URL of the user's profile picture.
     /// </summary>
-    public string? ProfilePictureUrl { get; private set; }
+    public Url? ProfilePictureUrl { get; private set; }
 
     /// <summary>
     /// Gets and sets privately the timestamp when the user last logged in.
@@ -197,5 +197,7 @@ public sealed partial class User : IEntity<Guid>
         EmailConfirmed = false;
         FailedLoginAttempts = 0;
         CreatedBy = createdBy;
+        PhoneNumber = null;
+        ProfilePictureUrl = null;
     }
 }
