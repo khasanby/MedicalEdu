@@ -1,15 +1,15 @@
 namespace MedicalEdu.Domain.ValueObjects;
 
-public sealed class Password : IEquatable<Password>
+public sealed class PasswordHash : IEquatable<PasswordHash>
 {
     public string Hash { get; }
 
-    private Password(string hash)
+    private PasswordHash(string hash)
     {
         Hash = hash;
     }
 
-    public static Password Create(string plainTextPassword)
+    public static PasswordHash Create(string plainTextPassword)
     {
         if (string.IsNullOrWhiteSpace(plainTextPassword))
             throw new ArgumentException("Password cannot be empty", nameof(plainTextPassword));
@@ -22,15 +22,15 @@ public sealed class Password : IEquatable<Password>
 
         // In a real implementation, this would be hashed using BCrypt or similar
         // For now, we'll just store the plain text (this should be replaced with proper hashing)
-        return new Password(plainTextPassword);
+        return new PasswordHash(plainTextPassword);
     }
 
-    public static Password FromHash(string hash)
+    public static PasswordHash FromHash(string hash)
     {
         if (string.IsNullOrWhiteSpace(hash))
             throw new ArgumentException("Hash cannot be empty", nameof(hash));
 
-        return new Password(hash);
+        return new PasswordHash(hash);
     }
 
     private static bool HasRequiredCharacters(string password)
@@ -48,11 +48,11 @@ public sealed class Password : IEquatable<Password>
         return Hash == plainTextPassword;
     }
 
-    public static implicit operator string(Password password) => password.Hash;
+    public static implicit operator string(PasswordHash password) => password.Hash;
 
     public override string ToString() => Hash;
 
-    public bool Equals(Password? other)
+    public bool Equals(PasswordHash? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -61,7 +61,7 @@ public sealed class Password : IEquatable<Password>
 
     public override bool Equals(object? obj)
     {
-        return Equals(obj as Password);
+        return Equals(obj as PasswordHash);
     }
 
     public override int GetHashCode()
@@ -69,12 +69,12 @@ public sealed class Password : IEquatable<Password>
         return Hash.GetHashCode();
     }
 
-    public static bool operator ==(Password? left, Password? right)
+    public static bool operator ==(PasswordHash? left, PasswordHash? right)
     {
-        return EqualityComparer<Password>.Default.Equals(left, right);
+        return EqualityComparer<PasswordHash>.Default.Equals(left, right);
     }
 
-    public static bool operator !=(Password? left, Password? right)
+    public static bool operator !=(PasswordHash? left, PasswordHash? right)
     {
         return !(left == right);
     }

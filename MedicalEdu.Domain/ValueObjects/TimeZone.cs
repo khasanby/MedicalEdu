@@ -2,19 +2,19 @@ using System;
 
 namespace MedicalEdu.Domain.ValueObjects;
 
-public sealed class TimeZone : IEquatable<TimeZone>
+public sealed class TimeZoneId : IEquatable<TimeZoneId>
 {
     /// <summary>
     /// Gets the time zone identifier.
     /// </summary>
     public string Id { get; }
 
-    private TimeZone(string id)
+    private TimeZoneId(string id)
     {
         Id = id;
     }
 
-    public static TimeZone Create(string timeZoneId)
+    public static TimeZoneId Create(string timeZoneId)
     {
         if (string.IsNullOrWhiteSpace(timeZoneId))
             throw new ArgumentException("Time zone identifier cannot be empty", nameof(timeZoneId));
@@ -22,10 +22,10 @@ public sealed class TimeZone : IEquatable<TimeZone>
         if (!IsValidTimeZone(timeZoneId))
             throw new ArgumentException("Invalid time zone identifier", nameof(timeZoneId));
 
-        return new TimeZone(timeZoneId);
+        return new TimeZoneId(timeZoneId);
     }
 
-    public static TimeZone Parse(string timeZoneId)
+    public static TimeZoneId Parse(string timeZoneId)
     {
         return Create(timeZoneId);
     }
@@ -61,14 +61,14 @@ public sealed class TimeZone : IEquatable<TimeZone>
     /// <summary>
     /// Implicitly converts the time zone to a string.
     /// </summary>
-    public static implicit operator string(TimeZone timeZone) => timeZone.Id;
+    public static implicit operator string(TimeZoneId timeZone) => timeZone.Id;
 
     /// <summary>
     /// Returns the string representation of the time zone.
     /// </summary>
     public override string ToString() => Id;
 
-    public bool Equals(TimeZone? other)
+    public bool Equals(TimeZoneId? other)
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
@@ -77,7 +77,7 @@ public sealed class TimeZone : IEquatable<TimeZone>
 
     public override bool Equals(object? obj)
     {
-        return Equals(obj as TimeZone);
+        return Equals(obj as TimeZoneId);
     }
 
     /// <summary>
@@ -91,15 +91,15 @@ public sealed class TimeZone : IEquatable<TimeZone>
     /// <summary>
     /// Checks if two time zones are equal.
     /// </summary>
-    public static bool operator ==(TimeZone? left, TimeZone? right)
+    public static bool operator ==(TimeZoneId? left, TimeZoneId? right)
     {
-        return EqualityComparer<TimeZone>.Default.Equals(left, right);
+        return EqualityComparer<TimeZoneId>.Default.Equals(left, right);
     }
 
     /// <summary>
     /// Checks if two time zones are not equal.
     /// </summary>
-    public static bool operator !=(TimeZone? left, TimeZone? right)
+    public static bool operator !=(TimeZoneId? left, TimeZoneId? right)
     {
         return !(left == right);
     }
