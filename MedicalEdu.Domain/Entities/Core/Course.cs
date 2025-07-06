@@ -139,6 +139,11 @@ public sealed partial class Course : IEntity<Guid>
     /// </summary>
     public string? LastModifiedBy { get; private set; }
 
+    /// <summary>
+    /// Gets whether the course is active (not soft-deleted).
+    /// </summary>
+    public bool IsActive => DeletedAt == null;
+
     public Course(
         Guid id,
         Guid instructorId,
