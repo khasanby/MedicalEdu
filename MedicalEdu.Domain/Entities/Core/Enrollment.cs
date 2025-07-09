@@ -112,4 +112,6 @@ public sealed partial class Enrollment : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private Enrollment() { }
 }

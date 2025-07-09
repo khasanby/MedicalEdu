@@ -75,6 +75,11 @@ public sealed class AuditLog : IEntity<Guid>
     /// </summary>
     public string? LastModifiedBy { get; private set; }
 
+    /// <summary>
+    /// Parameterless constructor for Entity Framework.
+    /// </summary>
+    private AuditLog() { }
+
     public AuditLog(
         Guid id,
         string entityName,

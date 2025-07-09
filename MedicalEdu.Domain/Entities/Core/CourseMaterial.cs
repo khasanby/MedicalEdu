@@ -138,4 +138,6 @@ public sealed partial class CourseMaterial : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private CourseMaterial() { }
 }

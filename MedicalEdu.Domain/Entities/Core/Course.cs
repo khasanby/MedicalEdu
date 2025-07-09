@@ -174,4 +174,6 @@ public sealed partial class Course : IEntity<Guid>
         IsPublished = false;
         CreatedBy = createdBy;
     }
+
+    private Course() { }
 }

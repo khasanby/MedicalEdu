@@ -131,4 +131,6 @@ public sealed partial class PromoCode : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private PromoCode() { }
 }

@@ -87,4 +87,6 @@ public sealed partial class UserSession : IEntity<Guid>
         LastActivityAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private UserSession() { }
 }

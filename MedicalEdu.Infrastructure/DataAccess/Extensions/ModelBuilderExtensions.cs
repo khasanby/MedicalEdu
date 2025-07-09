@@ -1,5 +1,6 @@
 using MedicalEdu.Domain.Abstractions;
 using MedicalEdu.Domain.ValueObjects;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace MedicalEdu.Infrastructure.DataAccess.Extensions;

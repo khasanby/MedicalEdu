@@ -73,4 +73,6 @@ public sealed partial class BookingPromoCode : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private BookingPromoCode() { }
 }

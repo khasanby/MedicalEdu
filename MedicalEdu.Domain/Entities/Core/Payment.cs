@@ -148,4 +148,6 @@ public sealed partial class Payment : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private Payment() { }
 } 

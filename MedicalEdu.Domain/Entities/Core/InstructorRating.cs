@@ -105,4 +105,6 @@ public sealed partial class InstructorRating : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private InstructorRating() { }
 } 

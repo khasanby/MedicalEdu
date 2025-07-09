@@ -154,4 +154,6 @@ public sealed partial class Booking : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private Booking() { }
 }

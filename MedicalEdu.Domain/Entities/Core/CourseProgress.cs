@@ -90,4 +90,6 @@ public sealed partial class CourseProgress : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private CourseProgress() { }
 } 

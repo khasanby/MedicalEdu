@@ -199,5 +199,9 @@ public sealed partial class User : IEntity<Guid>
         CreatedBy = createdBy;
         PhoneNumber = null;
         ProfilePictureUrl = null;
+        LastLoginAt = null;
+        LockedUntil = null;
     }
+
+    private User() { }
 }

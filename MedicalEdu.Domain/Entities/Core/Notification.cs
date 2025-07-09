@@ -147,4 +147,6 @@ public sealed partial class Notification : IEntity<Guid>
         ReadAt = null;
         CreatedBy = createdBy;
     }
+
+    private Notification() { }
 } 

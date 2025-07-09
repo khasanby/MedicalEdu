@@ -92,4 +92,6 @@ public sealed partial class CourseRating : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private CourseRating() { }
 } 

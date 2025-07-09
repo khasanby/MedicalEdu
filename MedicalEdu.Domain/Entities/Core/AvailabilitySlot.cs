@@ -146,4 +146,6 @@ public sealed partial class AvailabilitySlot : IEntity<Guid>
         CreatedAt = DateTimeOffset.UtcNow;
         CreatedBy = createdBy;
     }
+
+    private AvailabilitySlot() { }
 }
