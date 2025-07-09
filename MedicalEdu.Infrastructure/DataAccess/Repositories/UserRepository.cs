@@ -17,7 +17,9 @@ public sealed class UserRepository : IUserRepository
         _context = context ?? throw new ArgumentNullException(nameof(context));
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a user by their unique identifier.
+    /// </summary>
     public async ValueTask<User?> GetByIdAsync(Guid id, CancellationToken cancellationToken = default)
     {
         return await _context.Users
@@ -35,7 +37,9 @@ public sealed class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Id == id, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets a user by their email address.
+    /// </summary>
     public async ValueTask<User?> GetByEmailAsync(string email, CancellationToken cancellationToken = default)
     {
         return await _context.Users
@@ -43,7 +47,9 @@ public sealed class UserRepository : IUserRepository
             .FirstOrDefaultAsync(u => u.Email.Value == email, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Gets all users with optional filtering by active status.
+    /// </summary>
     public async Task<List<User>> GetAllAsync(bool? isActive = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Users.AsNoTracking().AsQueryable();
@@ -67,27 +73,35 @@ public sealed class UserRepository : IUserRepository
             .ToListAsync(cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Adds a new user to the repository.
+    /// </summary>
     public async ValueTask AddAsync(User user, CancellationToken cancellationToken = default)
     {
         await _context.Users.AddAsync(user, cancellationToken);
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Updates an existing user in the repository.
+    /// </summary>
     public ValueTask UpdateAsync(User user, CancellationToken cancellationToken = default)
     {
         _context.Users.Update(user);
         return ValueTask.CompletedTask;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Removes a user from the repository.
+    /// </summary>
     public ValueTask RemoveAsync(User user, CancellationToken cancellationToken = default)
     {
         _context.Users.Remove(user);
         return ValueTask.CompletedTask;
     }
 
-    /// <inheritdoc/>
+    /// <summary>
+    /// Saves all changes made in this repository to the database.
+    /// </summary>
     public async ValueTask<int> SaveChangesAsync(CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);

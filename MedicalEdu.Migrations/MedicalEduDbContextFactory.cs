@@ -1,7 +1,7 @@
+using MedicalEdu.Infrastructure.DataAccess;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
-using MedicalEdu.Infrastructure.DataAccess;
-using MedicalEdu.Domain.DataAccess;
+using Microsoft.Extensions.Configuration;
 
 namespace MedicalEdu.Migrations;
 
@@ -12,12 +12,18 @@ public class MedicalEduDbContextFactory : IDesignTimeDbContextFactory<MedicalEdu
 {
     public MedicalEduDbContext CreateDbContext(string[] args)
     {
+        var configuration = new ConfigurationBuilder()
+            .SetBasePath(Directory.GetCurrentDirectory())
+            .AddJsonFile("appsettings.json", optional: true)
+            .AddJsonFile("appsettings.Development.json", optional: true)
+            .AddEnvironmentVariables()
+            .Build();
+
+        var connectionString = configuration.GetConnectionString("MedDB");
+
         var optionsBuilder = new DbContextOptionsBuilder<MedicalEduDbContext>();
-        
-        // Use a default connection string for design-time operations
-        // This will be overridden at runtime with the actual connection string
-        optionsBuilder.UseNpgsql("Host=localhost;Database=MedicalEdu;Username=postgres;Password=postgres");
-        
+        optionsBuilder.UseNpgsql(connectionString);
+
         return new MedicalEduDbContext(optionsBuilder.Options);
     }
-} 
+}

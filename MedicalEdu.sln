@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.13.35825.156 d17.13
+VisualStudioVersion = 17.13.35825.156
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalEdu.Domain", "MedicalEdu.Domain\MedicalEdu.Domain.csproj", "{18CC827F-8C58-41B8-B120-B937EA5D67F2}"
 EndProject
@@ -12,8 +12,6 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalEdu.Api", "MedicalEdu.Api\MedicalEdu.Api.csproj", "{DBCBD713-E213-4F08-BF57-DE780501967A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalEdu.Migrations", "MedicalEdu.Migrations\MedicalEdu.Migrations.csproj", "{7D89F984-687C-45FB-BBC2-688E5A19ACB1}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MedicalEdu.Bootstrap", "MedicalEdu.Bootstrap\MedicalEdu.Bootstrap.csproj", "{C31F1229-0D6D-4178-9DA3-AE356D548E8E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -41,10 +39,6 @@ Global
 		{7D89F984-687C-45FB-BBC2-688E5A19ACB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7D89F984-687C-45FB-BBC2-688E5A19ACB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7D89F984-687C-45FB-BBC2-688E5A19ACB1}.Release|Any CPU.Build.0 = Release|Any CPU
-		{C31F1229-0D6D-4178-9DA3-AE356D548E8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{C31F1229-0D6D-4178-9DA3-AE356D548E8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{C31F1229-0D6D-4178-9DA3-AE356D548E8E}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{C31F1229-0D6D-4178-9DA3-AE356D548E8E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
