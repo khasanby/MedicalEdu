@@ -30,16 +30,6 @@ public class Program
 
             logger.LogInformation("Connecting to database...");
 
-            // Check if database exists
-            var databaseExists = await context.Database.CanConnectAsync();
-            if (!databaseExists)
-            {
-                logger.LogInformation("Database does not exist. Creating database...");
-                await context.Database.EnsureCreatedAsync();
-                logger.LogInformation("Database created successfully.");
-            }
-
-            // Apply pending migrations
             logger.LogInformation("Applying pending migrations...");
             var pendingMigrations = await context.Database.GetPendingMigrationsAsync();
 

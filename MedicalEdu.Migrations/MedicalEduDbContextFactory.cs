@@ -33,7 +33,7 @@ public sealed class MedicalEduDbContextFactory : IDesignTimeDbContextFactory<Med
     private static IConfiguration BuildConfiguration()
     {
         var environmentName = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Development";
-
+        
         return new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
             .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)

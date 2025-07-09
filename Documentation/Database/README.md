@@ -1,181 +1,358 @@
-# Database Documentation
+# Database Migration Tool Documentation
 
-This folder contains comprehensive documentation for the MedicalEdu database design, schema, and implementation.
+## Overview
 
-## 📁 Database Documentation Files
+The `MedicalEdu.Migrations` project is a standalone console application designed to handle database creation and migration application for the MedicalEdu platform. It provides a robust, production-ready solution for managing database schema changes across different environments.
 
-### Core Schema Documentation
-- **[DATABASE_SCHEMA.md](DATABASE_SCHEMA.md)** - Complete database schema documentation
-  - Entity descriptions and relationships
-  - Business rules and constraints
-  - Performance considerations and indexing
-  - Security requirements
-  - Migration strategies
+## Features
 
-### Visual Schema
-- **[database_schema_optimized.dbml](database_schema_optimized.dbml)** - Optimized dbdiagram.io schema file
-  - Copy-paste into https://dbdiagram.io/d
-  - Interactive visual representation
-  - Export to PNG, PDF, or SQL formats
+### ✅ Standalone Console Application
+- Runs independently of the main API
+- No dependency on web server or hosting environment
+- Perfect for CI/CD pipelines and containerized deployments
 
-### Schema Optimization
-- **[SCHEMA_OPTIMIZATION_SUMMARY.md](SCHEMA_OPTIMIZATION_SUMMARY.md)** - Detailed summary of schema improvements
-  - Key issues identified and fixed
-  - New features and capabilities
-  - Performance optimizations
-  - Business flow coverage
+### ✅ Environment-Specific Configuration
+- Supports Development, Staging, and Production environments
+- Uses standard .NET configuration patterns
+- Environment-specific connection strings and settings
 
-## 🗄️ Database Overview
+### ✅ Comprehensive Logging
+- Detailed logging of migration progress
+- Database operation tracking
+- Error reporting and debugging information
+- Structured logging with different log levels
 
-The MedicalEdu platform uses a comprehensive optimized database design with **15 core entities**:
+### ✅ Error Handling
+- Graceful handling of connection issues
+- Migration conflict resolution
+- Database creation error handling
+- Clear error messages and troubleshooting guidance
 
-### Core Entities
-1. **Users** - Multi-role user management with enhanced security
-2. **Courses** - Rich course metadata with categorization and pricing
-3. **CourseMaterials** - File upload and content management with progress tracking
-4. **AvailabilitySlots** - Advanced scheduling with group sessions and recurring patterns
-5. **Bookings** - Complete booking lifecycle with rescheduling and virtual sessions
-6. **Payments** - Multi-provider payment processing with partial refunds
-7. **Enrollments** - Student course enrollment with detailed progress tracking
-8. **CourseProgress** - Granular progress tracking per course material
-9. **Notifications** - Multi-channel notification system with scheduling
-10. **AuditLogs** - Comprehensive activity tracking and security
-11. **PromoCodes** - Flexible discount system with usage limits
-12. **BookingPromoCodes** - Promo code application tracking
-13. **UserSessions** - Session management and security
-14. **InstructorRatings** - Instructor feedback system
-15. **CourseRatings** - Course feedback system
+### ✅ Database Creation
+- Automatically creates database if it doesn't exist
+- Handles PostgreSQL-specific extensions (uuid-ossp)
+- Proper database initialization
 
-### Key Features
-- **GUID Primary Keys** for better distribution and security
-- **UTC Timestamps** for consistency across time zones
-- **Soft Deletes** using `deleted_at` timestamps
-- **Comprehensive Audit Trail** for all critical operations
-- **Multi-Provider Payment Support** (Stripe, PayPal)
-- **Role-Based Access Control** with enhanced security
-- **Multi-Currency Support** throughout the system
-- **Group Session Support** with participant tracking
-- **Recurring Availability** with JSON pattern support
-- **Promotional Features** with flexible discount system
-- **Rating System** for both instructors and courses
-- **Progress Tracking** with detailed analytics
+## Project Structure
 
-## 🚀 Quick Start
-
-### View Complete Documentation
-Read [DATABASE_SCHEMA.md](DATABASE_SCHEMA.md) for detailed information about:
-- Entity relationships and constraints
-- Business rules and validation
-- Performance optimization strategies
-- Security considerations
-- Migration and deployment guidelines
-
-### View Optimization Summary
-Read [SCHEMA_OPTIMIZATION_SUMMARY.md](SCHEMA_OPTIMIZATION_SUMMARY.md) for:
-- Key improvements and fixes
-- New features and capabilities
-- Performance enhancements
-- Business flow coverage
-
-### Generate Visual Diagram
-1. Go to https://dbdiagram.io/d
-2. Copy the content from `database_schema_optimized.dbml`
-3. Paste into the editor
-4. Save to generate your interactive diagram
-
-### Database Setup
-```bash
-# Run Entity Framework migrations
-dotnet ef database update
-
-# Verify database creation
-dotnet ef database info
+```
+MedicalEdu.Migrations/
+├── Program.cs                    # Main application entry point
+├── MedicalEduDbContextFactory.cs # EF Core context factory
+├── appsettings.json             # Default configuration
+├── appsettings.Development.json # Development environment
+├── MedicalEdu.Migrations.csproj # Project file
+└── bin/                         # Compiled output
 ```
 
-## 📊 Schema Highlights
+## Usage
 
-### Enhanced User Management
-- Multi-role system (Admin, Instructor, Student)
-- Email verification workflow with password reset
-- Account locking and failed login tracking
-- Session management with activity tracking
-- Timezone support for booking display
-- Profile management with contact information
+### Basic Usage
 
-### Advanced Course System
-- Instructor course creation and publishing
-- Rich metadata (tags, categories, duration)
-- Content upload with file metadata and duration
-- Access control (free vs. premium content)
-- Enrollment tracking with detailed progress monitoring
-- Video intro support and thumbnail management
+```bash
+# Navigate to migrations directory
+cd MedicalEdu.Migrations
 
-### Comprehensive Booking & Payment
-- Availability slot management with group sessions
-- Complete booking lifecycle with rescheduling
-- Virtual session support with meeting URLs
-- Multi-provider payment processing
-- Partial refunds and refund reasons
-- Promo code integration
+# Run migrations (uses appsettings.json by default)
+dotnet run
+```
 
-### Advanced Notifications & Audit
-- Multi-channel notification system (Email, SMS, Push)
-- Scheduled notifications for reminders
-- System-wide notification management
-- Email delivery tracking
-- Comprehensive audit logging
-- Security and compliance features
+### Environment-Specific Usage
 
-### New Features
-- **Progress Tracking**: Granular completion tracking per material
-- **Rating System**: Instructor and course feedback
-- **Promotional Features**: Flexible discount codes
-- **Group Sessions**: Multi-participant slot management
-- **Recurring Slots**: JSON-based recurring patterns
-- **Session Management**: Secure session handling
+```bash
+# Development environment
+dotnet run --environment Development
 
-## 🔧 Technical Details
+# Production environment
+dotnet run --environment Production
 
-### Database Technology
-- **Database**: SQL Server
-- **ORM**: Entity Framework Core
-- **Migration Tool**: EF Core Migrations
-- **Connection**: Connection string configuration
+# Custom configuration
+dotnet run --configuration Release
+```
 
-### Performance Optimizations
-- Strategic indexing for common queries
-- Composite indexes for complex operations
-- Covering indexes for frequently accessed data
-- Soft delete filtering optimization
-- Time-based query optimization
-- Query optimization recommendations
+### CI/CD Integration
 
-### Security Features
-- Password hashing and encryption
-- Account locking and failed login tracking
-- Session management with expiration
-- Role-based authorization
-- Comprehensive audit trail for compliance
-- Input validation and sanitization
+```bash
+# Build the migration tool
+dotnet build MedicalEdu.Migrations
 
-## 📈 Future Enhancements
+# Run in production environment
+dotnet run --project MedicalEdu.Migrations --environment Production
+```
 
-### Planned Features
-- Database partitioning for audit logs
-- Read replicas for reporting
-- Advanced caching strategies
-- Data archiving policies
-- Real-time analytics dashboard
-- Advanced reporting capabilities
+## Configuration
 
-### Monitoring & Maintenance
-- Database performance monitoring
-- Automated backup strategies
-- Index maintenance schedules
-- Data retention policies
-- Session cleanup automation
-- Audit log rotation
+### Configuration Files
+
+The migration tool uses the same configuration structure as the main API:
+
+- **`appsettings.json`** - Default configuration
+- **`appsettings.Development.json`** - Development environment
+- **`appsettings.Production.json`** - Production environment
+
+### Connection String Configuration
+
+```json
+{
+  "ConnectionStrings": {
+    "DefaultConnection": "Host=localhost;Database=MedicalEdu;Username=postgres;Password=your_password"
+  }
+}
+```
+
+### Logging Configuration
+
+```json
+{
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.EntityFrameworkCore.Database.Command": "Information"
+    }
+  }
+}
+```
+
+## Migration Process
+
+### 1. Connection Establishment
+- Validates connection string configuration
+- Attempts to connect to the database server
+- Handles connection errors gracefully
+
+### 2. Database Creation
+- Checks if database exists
+- Creates database if it doesn't exist
+- Installs required PostgreSQL extensions (uuid-ossp)
+
+### 3. Migration History Setup
+- Creates `__EFMigrationsHistory` table
+- Tracks applied migrations and their versions
+- Ensures migration integrity
+
+### 4. Migration Application
+- Identifies pending migrations
+- Applies migrations in chronological order
+- Creates tables, indexes, and constraints
+- Records migration completion
+
+### 5. Verification
+- Confirms all migrations are applied
+- Validates database schema
+- Reports migration status
+
+## Database Schema
+
+### Core Entities (15 Total)
+
+#### User Management
+- **Users** - Multi-role user management with email verification
+- **UserSessions** - User session management and authentication
+
+#### Course Management
+- **Courses** - Course creation and publishing workflow
+- **CourseMaterials** - File upload and content management
+- **CourseRatings** - Student course ratings and reviews
+- **Enrollments** - Student course enrollment tracking
+- **CourseProgresses** - Student progress tracking per course material
+
+#### Booking & Scheduling
+- **AvailabilitySlots** - Instructor scheduling system
+- **Bookings** - Student booking lifecycle management
+- **BookingPromoCodes** - Promotional code application to bookings
+
+#### Payment & Financial
+- **Payments** - Multi-provider payment processing
+- **PromoCodes** - Discount and promotional code management
+
+#### Communication & Analytics
+- **Notifications** - System-wide notification management
+- **InstructorRatings** - Student ratings for instructors
+- **AuditLogs** - Comprehensive activity tracking
+
+### Database Features
+
+- **UUID Primary Keys** - All entities use UUID primary keys for security
+- **Audit Trail** - Comprehensive audit logging with user tracking
+- **Soft Deletes** - Support for soft deletion where applicable
+- **Optimized Indexes** - Performance-optimized database indexes
+- **Foreign Key Constraints** - Proper referential integrity
+- **Time Zone Support** - UTC timestamps with timezone awareness
+
+## Troubleshooting
+
+### Common Issues
+
+#### Database Already Exists
+**Problem**: Tables exist from previous runs causing conflicts
+**Solution**: 
+```bash
+# Drop database manually
+psql -h localhost -U postgres -c "DROP DATABASE \"MedicalEdu\";"
+
+# Or use EF Core CLI
+dotnet ef database drop --project MedicalEdu.Migrations
+```
+
+#### Connection Issues
+**Problem**: Cannot connect to database
+**Solution**:
+1. Verify connection string in `appsettings.json`
+2. Check PostgreSQL server is running
+3. Confirm database credentials
+4. Test connection manually
+
+#### Migration Conflicts
+**Problem**: Pending migrations exist
+**Solution**:
+1. Check migration history: `dotnet ef migrations list`
+2. Remove conflicting migrations if needed
+3. Ensure clean migration state
+
+#### Permission Issues
+**Problem**: Insufficient database permissions
+**Solution**:
+1. Grant necessary permissions to database user
+2. Ensure user can create databases and tables
+3. Check PostgreSQL role configuration
+
+### Error Messages
+
+#### Connection Error
+```
+fail: RelationalEventId.ConnectionError[20004]
+An error occurred using the connection to database 'MedicalEdu'
+```
+**Action**: Check connection string and database server status
+
+#### Migration Already Applied
+```
+fail: Microsoft.EntityFrameworkCore.Database.Command[20100]
+Migration '20250709110227_Initial' already applied
+```
+**Action**: Database is up to date, no action needed
+
+#### Table Already Exists
+```
+fail: Microsoft.EntityFrameworkCore.Database.Command[20100]
+relation "Users" already exists
+```
+**Action**: Drop database and rerun migrations
+
+## Best Practices
+
+### Development Workflow
+
+1. **Create Migration**: Use EF Core CLI to create migrations
+   ```bash
+   dotnet ef migrations add Initial --project MedicalEdu.Migrations
+   ```
+
+2. **Test Migration**: Run migration tool to test changes
+   ```bash
+   cd MedicalEdu.Migrations
+   dotnet run
+   ```
+
+3. **Verify Schema**: Check database schema matches expectations
+   ```bash
+   psql -h localhost -U postgres -d MedicalEdu -c "\dt"
+   ```
+
+### Production Deployment
+
+1. **Backup Database**: Always backup before migrations
+2. **Test in Staging**: Test migrations in staging environment first
+3. **Monitor Logs**: Watch migration logs for any issues
+4. **Verify Data**: Confirm data integrity after migration
+
+### Migration Naming
+
+- Use descriptive migration names
+- Include date prefix for chronological ordering
+- Example: `20250709110227_Initial`
+
+## Integration with CI/CD
+
+### Azure DevOps Pipeline
+
+```yaml
+- task: DotNetCoreCLI@2
+  displayName: 'Run Database Migrations'
+  inputs:
+    command: 'run'
+    projects: 'MedicalEdu.Migrations/MedicalEdu.Migrations.csproj'
+    arguments: '--environment Production'
+```
+
+### GitHub Actions
+
+```yaml
+- name: Run Database Migrations
+  run: |
+    cd MedicalEdu.Migrations
+    dotnet run --environment Production
+```
+
+### Docker Deployment
+
+```dockerfile
+# Build migration tool
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+COPY ["MedicalEdu.Migrations/MedicalEdu.Migrations.csproj", "MedicalEdu.Migrations/"]
+RUN dotnet restore "MedicalEdu.Migrations/MedicalEdu.Migrations.csproj"
+COPY . .
+RUN dotnet build "MedicalEdu.Migrations/MedicalEdu.Migrations.csproj" -c Release -o /app/build
+
+# Run migrations
+FROM mcr.microsoft.com/dotnet/aspnet:8.0
+WORKDIR /app
+COPY --from=build /app/build .
+ENTRYPOINT ["dotnet", "MedicalEdu.Migrations.dll"]
+```
+
+## Security Considerations
+
+### Connection String Security
+- Use environment variables for sensitive connection strings
+- Avoid hardcoding credentials in configuration files
+- Use managed identities in cloud environments
+
+### Database Permissions
+- Grant minimal required permissions
+- Use dedicated database user for migrations
+- Implement proper access controls
+
+### Audit Logging
+- All database changes are logged
+- User tracking for all operations
+- Comprehensive audit trail maintained
+
+## Performance Optimization
+
+### Migration Performance
+- Batch operations where possible
+- Use appropriate indexes
+- Optimize large table migrations
+
+### Database Optimization
+- Regular index maintenance
+- Monitor query performance
+- Implement proper partitioning strategies
+
+## Monitoring and Alerting
+
+### Migration Monitoring
+- Track migration execution time
+- Monitor database size changes
+- Alert on migration failures
+
+### Health Checks
+- Database connectivity checks
+- Schema validation
+- Migration status verification
 
 ---
 
-**Database Documentation** - Comprehensive guide to the optimized MedicalEdu data architecture. 
+**Note**: This migration tool is designed to be production-ready and follows best practices for database migration management. Always test migrations in a staging environment before applying to production. 

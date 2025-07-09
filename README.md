@@ -77,22 +77,48 @@ MedicalEdu/
 ├── MedicalEdu.Domain/        # Entities, Enums & Domain Logic
 ├── MedicalEdu.Infrastructure/# Data Access & External Services
 ├── MedicalEdu.Bootstrap/     # Dependency Injection Setup
-└── MedicalEdu.Migrations/    # Database Migrations
+├── MedicalEdu.Migrations/    # Database Migration Tool
+└── Documentation/            # Project Documentation
+    ├── Database/            # Database & Migration Documentation
+    ├── API/                # API Documentation
+    ├── Architecture/       # System Architecture
+    └── Features/           # Feature Documentation
 ```
 
 ## 🗄️ Database Schema
 
-The platform features a comprehensive database design with 8 core entities:
+The platform features a comprehensive database design with 15 core entities:
 
+### Core Entities
 - **Users**: Multi-role user management with email verification
+- **UserSessions**: User session management and authentication
 - **Courses**: Course creation and publishing workflow
 - **CourseMaterials**: File upload and content management
+- **CourseRatings**: Student course ratings and reviews
+- **Enrollments**: Student course enrollment tracking
+- **CourseProgresses**: Student progress tracking per course material
+
+### Booking & Scheduling
 - **AvailabilitySlots**: Instructor scheduling system
 - **Bookings**: Student booking lifecycle management
+- **BookingPromoCodes**: Promotional code application to bookings
+
+### Payment & Financial
 - **Payments**: Multi-provider payment processing
-- **Enrollments**: Student course enrollment tracking
+- **PromoCodes**: Discount and promotional code management
+
+### Communication & Analytics
 - **Notifications**: System-wide notification management
+- **InstructorRatings**: Student ratings for instructors
 - **AuditLogs**: Comprehensive activity tracking
+
+### Database Features
+- **UUID Primary Keys**: All entities use UUID primary keys for security
+- **Audit Trail**: Comprehensive audit logging with user tracking
+- **Soft Deletes**: Support for soft deletion where applicable
+- **Optimized Indexes**: Performance-optimized database indexes
+- **Foreign Key Constraints**: Proper referential integrity
+- **Time Zone Support**: UTC timestamps with timezone awareness
 
 ## 🚀 Getting Started
 
@@ -121,12 +147,60 @@ cd MedicalEdu
 # Restore dependencies
 dotnet restore
 
-# Run migrations
-dotnet ef database update
+# Run database migrations
+cd MedicalEdu.Migrations
+dotnet run
 
 # Start development server
+cd ..
 dotnet run --project MedicalEdu.Api
 ```
+
+### Database Migration Tool
+
+The project includes a standalone migration tool (`MedicalEdu.Migrations`) that handles database creation and migration application. For detailed documentation, see [Database Documentation](Documentation/Database/README.md).
+
+#### Features
+- **Standalone Console Application**: Runs independently of the main API
+- **Environment-Specific Configuration**: Supports Development, Staging, and Production environments
+- **Comprehensive Logging**: Detailed logging of migration progress and database operations
+- **Error Handling**: Graceful handling of connection issues and migration conflicts
+- **Database Creation**: Automatically creates the database if it doesn't exist
+
+#### Usage
+```bash
+# Navigate to migrations directory
+cd MedicalEdu.Migrations
+
+# Run migrations (uses appsettings.json by default)
+dotnet run
+
+# Run with specific environment
+dotnet run --environment Production
+
+# Run with custom configuration
+dotnet run --configuration Release
+```
+
+#### Configuration
+The migration tool uses the same configuration structure as the main API:
+- `appsettings.json` - Default configuration
+- `appsettings.Development.json` - Development environment
+- `appsettings.Production.json` - Production environment
+
+#### Migration Process
+1. **Connection**: Establishes database connection
+2. **Database Creation**: Creates database if it doesn't exist
+3. **Migration History**: Creates `__EFMigrationsHistory` table
+4. **Migration Application**: Applies pending migrations in order
+5. **Verification**: Confirms all migrations are applied successfully
+
+#### Troubleshooting
+- **Database Already Exists**: If tables exist from previous runs, drop the database manually or use EF Core CLI
+- **Connection Issues**: Verify connection string in `appsettings.json`
+- **Migration Conflicts**: Ensure no pending migrations exist before running the tool
+
+> 📖 **For comprehensive database documentation, including troubleshooting, best practices, and CI/CD integration, see [Database Documentation](Documentation/Database/README.md)**
 
 ## 🔧 Configuration
 
