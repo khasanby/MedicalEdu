@@ -52,7 +52,7 @@ public sealed class Email : IEquatable<Email>
     {
         if (other is null) return false;
         if (ReferenceEquals(this, other)) return true;
-        return Value == other.Value;
+        return string.Equals(Value, other.Value, StringComparison.OrdinalIgnoreCase);
     }
 
     public override bool Equals(object? obj)

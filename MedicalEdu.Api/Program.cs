@@ -2,6 +2,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using MedicalEdu.Infrastructure.DataAccess.Extensions;
+using MedicalEdu.Application.Common;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.OpenApi.Models;
 
@@ -73,6 +74,9 @@ public class Program
     {
         // Register infrastructure components
         hostBuilder.Services.AddInfrastructure(hostBuilder.Configuration);
+
+        // Register application components (MediatR, FluentValidation, AutoMapper)
+        hostBuilder.Services.AddApplication();
 
         hostBuilder.Services.AddControllers().AddJsonOptions(jsonOptions =>
         {

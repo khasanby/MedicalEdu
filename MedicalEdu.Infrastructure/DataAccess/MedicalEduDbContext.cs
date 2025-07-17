@@ -1,36 +1,69 @@
 using MedicalEdu.Domain.DataAccess;
 using MedicalEdu.Domain.Entities;
+using MedicalEdu.Infrastructure.DataAccess.Interceptors;
 using Microsoft.EntityFrameworkCore;
 
 namespace MedicalEdu.Infrastructure.DataAccess;
 
-public class MedicalEduDbContext : DbContext, IMedicalEduDbContext
+public sealed class MedicalEduDbContext : DbContext, IMedicalEduDbContext
 {
-    public MedicalEduDbContext(DbContextOptions<MedicalEduDbContext> options) : base(options)
+    private readonly AuditSaveChangesInterceptor _auditSaveChangesInterceptor;
+
+    public MedicalEduDbContext(
+        DbContextOptions<MedicalEduDbContext> options,
+        AuditSaveChangesInterceptor auditSaveChangesInterceptor) : base(options)
     {
+        _auditSaveChangesInterceptor = auditSaveChangesInterceptor;
     }
 
-    public DbSet<User> Users { get; set; }
-    public DbSet<Course> Courses { get; set; }
-    public DbSet<Booking> Bookings { get; set; }
-    public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; }
-    public DbSet<Payment> Payments { get; set; }
-    public DbSet<PromoCode> PromoCodes { get; set; }
-    public DbSet<Notification> Notifications { get; set; }
-    public DbSet<AuditLog> AuditLogs { get; set; }
+    // Transaction Management Implementation
+    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        await Database.BeginTransactionAsync(cancellationToken);
+    }
 
-    public DbSet<CourseMaterial> CourseMaterials { get; set; }
-    public DbSet<CourseRating> CourseRatings { get; set; }
-    public DbSet<CourseProgress> CourseProgresses { get; set; }
-    public DbSet<Enrollment> Enrollments { get; set; }
-    public DbSet<InstructorRating> InstructorRatings { get; set; }
-    public DbSet<BookingPromoCode> BookingPromoCodes { get; set; }
-    public DbSet<UserSession> UserSessions { get; set; }
+    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (Database.CurrentTransaction != null)
+        {
+            await Database.CurrentTransaction.CommitAsync(cancellationToken);
+        }
+    }
+
+    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    {
+        if (Database.CurrentTransaction != null)
+        {
+            await Database.CurrentTransaction.RollbackAsync(cancellationToken);
+        }
+    }
+
+    // Entity Sets
+    public DbSet<Course> Courses { get; set; } = null!;
+    public DbSet<User> Users { get; set; } = null!;
+    public DbSet<Enrollment> Enrollments { get; set; } = null!;
+    public DbSet<CourseProgress> CourseProgresses { get; set; } = null!;
+    public DbSet<CourseRating> CourseRatings { get; set; } = null!;
+    public DbSet<InstructorRating> InstructorRatings { get; set; } = null!;
+    public DbSet<Booking> Bookings { get; set; } = null!;
+    public DbSet<AvailabilitySlot> AvailabilitySlots { get; set; } = null!;
+    public DbSet<Payment> Payments { get; set; } = null!;
+    public DbSet<PromoCode> PromoCodes { get; set; } = null!;
+    public DbSet<BookingPromoCode> BookingPromoCodes { get; set; } = null!;
+    public DbSet<CourseMaterial> CourseMaterials { get; set; } = null!;
+    public DbSet<Notification> Notifications { get; set; } = null!;
+    public DbSet<UserSession> UserSessions { get; set; } = null!;
+    public DbSet<AuditLog> AuditLogs { get; set; } = null!;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.AddInterceptors(_auditSaveChangesInterceptor);
+        base.OnConfiguring(optionsBuilder);
+    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
-        modelBuilder.HasPostgresExtension("uuid-ossp");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(MedicalEduDbContext).Assembly);
+        modelBuilder.ApplyGlobalFilters();
     }
 }
